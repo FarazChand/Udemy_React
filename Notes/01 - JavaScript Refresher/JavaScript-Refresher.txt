@@ -1,0 +1,148 @@
+Intro
+------
+- React apps are typically built with the latest version of JavaScript
+- React itself uses a lot of next generation
+- JS features. So it's important to understand all of these features
+
+
+Understanding let & const
+--------------------------
+- different ways of creating variables
+	-> variables that we never really need to change are declared using const (constant value)
+	-> let is the new 'var', use it for variable values that might change (variable value)
+
+- let and const are also changing something behind the scenes about the scope of variables
+- var, the old way of declaring variables, still works - but you are highly encouraged to use let and const
+
+Note that if you accidently try to reassign a const value, you will get an error - allowing you to impove your code
+
+
+Arrow Functions
+---------------
+- besides the normal function declarations and function expressions, there are also arrow functions
+- a different syntax for creating JavaScript Functions
+- solves a lot of functions you have with the 'this' keyword
+- note that the 'this' keyword doesn't always refer to what you expected it to during you writing your code
+- when you use 'this' inside an arrow function, it will always keep it's context - and not suprise you by changing it on runtime
+
+- if you have exactly one argument/parameter, you can omit the parenthesis around it
+- if you have a function which receives no arguments, you have to pass an empty pair of parenthesis
+- if you have more than one argument, you also need parenthesis
+
+- if we just want to return something (one liner), we can omit the curly braces for the body and the return keyword
+
+
+Exports & Imports (Modules)
+---------------------------
+- JS code is usually split up over multiple files
+- they have to be imported in the correct order
+- inside of a JS file we can import content from another file so that the JS files themselves know their dependencies
+
+- we can export defaults using the 'default' keyword, or export specific objects/variables
+- we can import the defaults with a certain syntax, and import the specific exports with a different syntax
+
+default export/import:
+- e.g. export default person  (from a file named person.js)
+- at the end of the export file
+- imports what ever you marked as a default as default, if the default keyword is used during importing, this is what is imported
+- can specify what variable name it should be stored as in the import file
+- e.g. import prs from './person.js'
+
+specific export/import
+- 	e.g. export const person =....  (from a file named person.js)
+- just specifies what is to be exported, can have multiple objects/variables specified
+- imported using curly braces that contain the name of the item you are importing
+- 	e.g. import { person } from './person.js'
+- can import multiple items by adding a comma then the next item name between the curly braces
+- can assign an alias by using the 'as' keyword after the item name, followed by the alias
+-	e.g. import { person as prs } from './person.js'
+- can also import everything using the '*' character - and then assign an alias
+- this creates a JS object which exposes all exports from the export file as properties
+	e.g. import * as bundled from './person.js'
+
+
+As with all these next generation JavaScript features, it won't run like this in all browsers - not even the most
+modern browsers can support all the features available. We need a tool to compile all these next generation JS features
+to current gen JS features. This allows us as a developer to use the next genereation JS without us shipping code that
+cannot be ran.
+
+
+Classes
+-------
+- essentially blueprints for objects - we create javascript objects with classes as blueprints
+- created with the class keyword
+- can have both properties(variables) and methods(functions)
+- instantiated with the 'new' keyword (like with constructor functions)
+- classes are kind of a more convenient way of creating constructor functions
+- classes also support inheritance, which means it can take all the properties and methods from another class(parent), as well as potentially adding new properties and methods
+- you might be noticing a simillarity to prototypes
+
+- all classes can have a constructor function to add its properties/methods
+- the constructor function you can add to any class which will be executed anytime you instantiate the class
+- can add properties using the 'this' keyword, and add properties through normal function declarations (and maybe expressions)
+
+- we support inheritance by using the 'extends' keyword
+	eg. class Person extends Human {...}
+- we also must call the super constructor function within the class's main constructor
+- 'super' is a keyword that executes the parent constructor, allowing us to correctly initialize the class and inherit the parents properties/methods
+- this keyword would be the first line of code in the body of the child class' constructor function
+
+Note: Classes are one of the two ways that React creates 'components' 
+
+
+Classes, Properties & Methods
+------------------------------
+- in new gen JS, we don't need to use the constructor or super functions in our syntax, we also don't need to use the 'this' keyword
+- note that the constructor function and 'this' keyword are being implemented in the background, but we don't need to use it in our syntax because of next gen JS
+- we can simply assign properties like we would normally do, eg myProperty = 'value'
+- note that you still need to use the 'this' keyword when accessing properties through methods
+- we can also assign methods like they were properties, eg myMethod = () => {...}
+- since we use an arrow function as a property value, we have 0 issues with the 'this' keyword
+
+
+Spread & Rest Operators
+-----------------------
+- both of these operators use the same operator'...'
+- the difference depends on where we use them
+- spread is used to split up array elements OR object properies
+- rest is used to merge a list of function arguments into an array
+
+
+Destructuring
+-------------
+- Easily extract array elements or object properties and store them in variables
+- spread takes out all elements/properties and distributes them where ever you are using it
+- destructuring allows you to pull out single elements/properties and store them in variables
+- simply have [](for arrays) or {}(for objects) on the left side of the equal sign
+- inside of these brackets, we have variables that we want to store the elements/properties
+- for arrays, these elements are stored in the order they appear - can skip elements by adding a comma followed by an empty space
+- for objects, we must use the property name of the object to destructor the correct property, but can also use an alias after specifying the property
+
+
+Reference and Primitive types
+-----------------------------
+- primitive types: 
+	-> numbers, strings, boolean, null, undefined, etc
+	-> when ever you store a variable in another variable, you will copy the value
+- Reference: 
+	-> objects, arrays, etc
+	-> when ever you store a variable in another variable, does not copy, it creates a reference
+	-> objects are stored in memory, in the identifier of this object we store a pointer to that place in memory
+	-> if we then assign that identifier to another variable, the pointer will be copied
+	-> this essentially means that both identifiers are pointing to the same object
+	-> so if one object is changed, the other one is changed.. because there actually is only one object
+
+This is important to understand in React because it can lead to unexpected behaviors if you 'copy' objects or arrays,
+because you may then manipulate one object in one place in the app and accidently manipulate another usage of the same object
+in another place of the app. 
+
+Therefor, we will learn techniques to copy these reference types in an 'immutable' way, meaning we copy the actual object, not just the pointer
+- one way of doing this is using the spread operator, however, this is just a shallow copy (only makes a copy of first level, deeper level are still references)
+
+
+Array Functions
+---------------
+- there are many array methods
+- they all essentially work in the same way
+- they take a function as an input, which is then executed on each element in the array
+- they are not next gen JS but actually normal JS
