@@ -1,0 +1,45 @@
+Intro
+-----
+- this section is about learning how to build component-driven UI, the component concept is embraced by React
+- we learn what componenets are and why exactly React embraces them
+
+This mean we learn:
+- React Core Syntax & JSX
+- What Components are and how to work with them 
+- Working with Data
+- All the key concepts needed for every React App you will build
+
+
+What are Components? And why is React all About Them?
+-----------------------------------------------------
+- React is a JS library for building UI, in general, so are HTML, CSS and JS
+- we use libraries like React because they simplify building complex, interactive and reactive user interfaces
+- in order to achieve this, React uses 'Components'
+
+- components are reusable building blocks in your user interface
+- components are just a combination of HTML code, CSS for styling and possibly JS for logic
+- reusability is just a trait of a component, not a requirement
+
+- all user interfaces are made up of components(building blocks)
+- pretty much everything you see on a UI is a component, except for text itself(althought that could probably be a component as well if we wanted)
+- for example, on twitter, each post is a component - each icon is a component, these components are stored in other components - which are stored in other components
+- containers, buttons, input elements, etc.. all are components
+- all user interfaces can be split up into components
+
+- React is all about these components
+- you build these individual components, and then you tell React how to compose them together into a final user interface
+- React embraces this concept of components because:
+	-> of the reusability aspect (avoid repetition and DRY)
+	-> it allows us to seperate our concerns (Don't do too many things in one and the same place, keeps codebase small and managable)
+ 		-> instead of having one file for all the html code, and one for all the JS code for the entire UI...
+		-> we have small, seperate units (components) where every component has one clear concern/focus
+		-> if we split this code throughout multiple files, we have small pieces of code which are easy to manage and maintain
+		-> this is simillar to splitting big chunks of code into multiple smaller functions
+
+
+React is Written in a 'Declarative Way'!
+----------------------------------------
+- react allows you to create re-usable and reactive components consisting of HTML and JS (and then some CSS after), which we then use to build user interfaces
+- react uses something called a 'declarative' approach
+	-> define the desired target state(s) and let React figure out the actual JavaScript Dom instructions
+- pretty much build our own, custom HTML elements which we combine together to build a user interface

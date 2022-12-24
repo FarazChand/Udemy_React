@@ -1,0 +1,81 @@
+What is React and Why would we Use It?
+--------------------------------------
+- React is a client-side JavaScript library for building user interfaces - helps us with writing client side JS code
+- all about building modern, reactive user interfaces for the web
+- JavaScript is a programming language that allows us as a developer to run logic in the browser..
+- You can manipulate the HTML structure(DOM) of the page with JS
+- this allows us to change what the user sees without fetching a new HTML page, making things much more fluid and reactive (snappy)
+
+
+Why React Instead of 'Just JavaScript'?
+---------------------------------------
+- using just JS can work, but you have to write a lot of code - usually code that has already been figured out and written elsewhere (reinvent the wheel)
+- you have to write every single step that should be taken
+- we have to write a lot of low level code this way - which takes a lot of time and effort. It's doable, but there is an easier way
+
+- these low level instructions are not written by us when using React
+- instead, they are defined by the React library
+- we as a developer, work on a higher level 
+- this makes working with react and building complex UI WAY EASIER.  
+
+In summary - React makes building modern, rich, complex UI easier - and it does so by giving us a higher level syntax where we write code with a declarative,
+component-focused approach. (declarative meaning: focusing on specifying the result of what you want, evaluate result based on input)
+
+
+Building Sing-Page-Applications(SPAs)
+-------------------------------------
+- when working with react, we often build SPAs
+- SPA: server only sends one HTML page, thereafter, React takes over and controls the UI
+- usually leads to a smoother UI and a better user experience
+- react can be used to control parts of HTML pages or entire pages (widgets, rest of the pages might be served by the backend)
+- react can also be used to control the entire frontend of a web application
+
+
+React.js Alternatives
+---------------------
+- React:	
+	-> one of the most popular front end frameworks/libraries
+	-> it's a open and focused component-based UI library
+	-> certain features (e.g. routing) are added via community packages, react is mostly focused on its components feature
+
+- Angular:
+	-> an alternative to react which has more built in features, very important and popular front end framework
+	-> a complete component-based UI framework, packed with features
+	-> uses TypeScript
+	-> can be overkill for smaller projects, but you don't need to rely on the community as much for larger projects
+
+- Vue:
+	-> 'in between the two extremes of React and Angular' he said
+	-> a complete component-based UI framework
+	-> includes most core features (like routing), means less dependency on the community
+	-> a bit less popular than React & Angular 
+
+
+Course Outiline:
+----------------
+
+Basic and Foundation (Introducing Key Features):
+- Components & Building UIs
+- Working with Events & Data: 'props' and 'state'
+- Styling React Apps & Components
+- Introduction into 'React Hooks'
+
+
+Advanced Concepts (Building for Production):
+- Side Effects, 'Refs' & More React Hooks
+- React's Context API & Redux
+- Forms, Http Requests & 'Custom Hooks'
+- Routing, Deployment, NextJS & More
+
+
+Note: Section 1 part 9 has a lot of very good tips on how to use these types of pre-recorded video courses.
+
+
+
+Setting Up The Course Dev Environment (Code Editor)
+---------------------------------------------------
+- need a code editor (vs code)
+- can install extensions (view > extensions)
+- install prettier extension for code formatting - set default formatting to prettier in settings
+- can instal material icons extension to change icons...
+
