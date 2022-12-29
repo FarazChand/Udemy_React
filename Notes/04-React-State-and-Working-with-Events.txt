@@ -1,0 +1,222 @@
+Intro
+-----
+- we learned about components and props, time to take the next step
+- in this module, we will look at user interaction and handling user events (clicks, inputs in text fields, etc.)
+- going to look at the very important concept of state in React apps
+- remember that in React, we follow a declarative approach 
+	-> we define our desired target state
+	-> React takes care of reaching that state
+
+- we want to have applications that are interactive so that they can react to clicks by the user, and to data being entered by the user etc.
+- we want it to be reactive as well, so that things change when certain things happen
+
+- we will be:
+	-> learning about handling events
+	-> Updating the UI & Working with 'State'
+	-> Taking a closer look at Components & State
+
+
+Listening to Events & Working with Event Handlers
+--------------------------------------------------
+- On all built in HTML elements, we have full access to a number of native DOM events which we can listen for  
+	-> on every element, there are a bunch of events we can listen for
+	-> for every default event there is a prop equivalent in React
+	
+- we can add these props to the built in HTML elements to listen to these events
+	-> we do this by going to the HTML element we want to add a listener to(e.g. a button), and adding a special prop
+	-> this is not a prop that sets some value for the element
+	-> this is a prop that starts with 'on'
+	-> React exposes all these default events as props which start with 'on'
+	-> e.g. for a click event, it would be 'onClick'
+	-> this would add an event listener for a click event on the element that we passed it to as a prop
+
+- we just need to define what happens when the click event occurs
+	-> we do that by assigning a value to the onClick prop
+	-> the value has to be a function that should be executed when the click occurs
+
+- all of these event handler props (on props) want a function as a value which is then executed when that event occurs
+	-> the function can be created on the fly as embedded code - but we don't usually like to do in line complex logic, makes the JSX less readable
+	-> we typically want to define our function before the return - then use its identifier in the embedded code instead
+	-> note that we are not calling/executing the function in the embedded code, just pointing at it
+
+- all default HTML elements have access to events, some have access to more than others
+	-> if an element supports an event, then you can add a listener with React by adding  'on' + the event name prop
+
+- the convention for naming these functions are to end with 'Handler' if it is handling an event
+	-> e.g. 'clickHandler' is a good name for a function that handle click events
+	-> just a preference, makes it clear that it is not a function called by us somewhere else in our code, but a function that is attatched to an event listener
+
+
+How Component Functions are Executed
+------------------------------------
+- reacting to events is an important first step, now - how can we change what shows up on the screen?
+	-> lets say we are listening for a click on a button, when the event happens it will change some content - like a title
+	-> lets say the title is currently gets its value from props.title 
+	-> for the content that you want to be dynamic, we don't want it to be set directly as a prop
+	-> instead, we want to create a variable and assign it the value of the prop
+	-> we can then have this variables value changed when an event happens by defining this behavior in the event handler
+	-> this changes the value of the content once the even is triggered - however, we won't see the change reflected on the webpage...
+	-> note that the value has actually changed, it just hasn't rendered... why you ask?
+
+- we still need another step before this works, and this is because of how React parses JSX
+	-> keep in mind that your component is a function
+	-> the only special thing about this function is that it returns JSX
+	-> since its a function, someone has to call it - and we never call these components explicitly
+	-> this actually happens behind the scenes, and is how React really works
+
+	-> our App component is a function that returns JSX, every component nested inside the App component is also a function that returns JSX
+	-> when our webpage is visited, the React app is loaded
+	-> it might not look like it because of syntactic sugar, but in our index.js - we are actually calling that App component
+	-> this subsequently ends up calling all the nested components which end up returning JSX, which eventually get rendered to the page
+	-> the problem with this is that it renders once
+	-> so when we change the content of something after this render has happened, it will not appear on the screen, because it has already rendered in its original state
+	-> in order for the change to appear, it would need to re-render again
+	-> we need a way of telling react that something changed and that a certain component should be re-evaluated
+	-> this is where react introduces a special concept called state
+
+
+Working with State
+------------------
+- state is not actually a React specific concept, but it is a key concept in React as well
+
+- our components are only called and executed once which causes the page to render
+- even if the value of a variable responsible for some content changes, by default, this change wont be reflected because it happens after the initial render
+- at the moment, the click event doesn't tell React to re-render the component 
+- in other words, our component function is never executed again, and it's JSX is never re-rendered with the new content value
+- in order to add this functionality to React - we need to import something from the React Library
+
+- we do this by adding a so called 'Named' import called 'useState'
+- so far we have imported the default import from React, but we can import specific things that are not included in this default import
+	e.g	import React from 'react';		// default import
+	e.g.	import React, {useState} from 'react;	//adding a named import in order to add a specific functionality, in this case - the function 'useState'
+
+- useState is a function provided by the React library
+	-> it allows us to define values as state
+	-> this means that changes to these values should reflect(result?) in the component function being called again
+	-> this is a key difference between using a regular variable to store content value
+	-> we use this useState function by calling it inside of our component function
+
+
+- useState is a so called 'React hook'
+	-> there are other hooks as well, but useState is one of the most important ones
+	-> all the react hooks can be identified by the fact that they start with the word 'use' in their name
+	-> all these hooks must only be called INSIDE of React components (the function definition)
+	-> they cant be called OUTSIDE of the component
+	-> the also can NOT be called inside any NESTED functions within the component
+	-> the MUST be called DIRECTLY inside such component functions
+
+ - useState requires a default state value
+	-> with useState, we basically create a special kind of variable
+	-> if this variable changes, it will lead to the component function being called again
+	-> we therefor assign an initial value for that special variable 
+	-> we can pass it a value of the relevant prop, 
+	-> e.g. if we wanted to change a title, we could pass props.title (assuming thats how we set it up) - which it uses to create the special variable
+	-> useState also returns something that gives us access to this special variable - meaning we can use it later
+	-> it also returns a function which we can then call to assign a new value to that variable 
+
+	-> this means that we will not be assigning values with the equal sign
+	-> instead we will be assigning new values by calling a function
+
+- useState actually returns an array, it actually always does this
+	-> the first value is the special variable itself - representing the current state value	
+	-> the second value of the array is the updating function - to update the state
+	-> we can use array destructuring to store both values into seperate variables or contants
+		eg. const [title, setTitle] = useState(props.title);
+		-> naming these constants are up to you
+		-> the convention is to use names that describe the value for the first variable
+		-> the convention is to use 'set' followed by the first variable name as the second variable name(camel case)
+	
+
+- This allows us remove our previous variable that we used to define the content we wanted to be dynamic, and replace its functionality..
+	-> remember, within the handler function, we are not setting a value using the equal sign
+	-> instead, we assign a new value by calling the state updating function
+	-> remember that this is the 2nd value we destructured from the return of the useState function from earlier
+		-> in our previous example, we would be calling the 'setTitle' function
+	-> we pass the value we want the state variable to be update to, e.g. 'updated!'
+	
+- calling the state updating function does not just assign a new value to some variable(its a special variable)
+	-> it's managed by React somewhere in memory
+	-> when we call the state updating function, this special variable will not just receive a new value
+	-> the component function in which you called this state updating function, and in which you initialized your state with useState...
+		-> will also be executed again
+		-> which is what we need to re-render the new value of the content
+	-> we want to call this component function again when our state changes
+	-> by calling this state updating function, this is happening
+	-> by calling this function you're telling React that you want to assign a new value to this state
+		-> that then also tells React that the component in which this state was registered with useState should be re-evaluated
+		-> therefor react will go ahead and execute this component function again , therefor also evaluating the JSX code again
+		-> it will then draw any changes it detects compared to the last time it evaluated this - on to the screen
+
+This means that the changed content will now re-render onto the screen!
+
+Note:
+- calling the state updating function actually doesn't change the value right away
+- instead it scheduals this state update
+- so in the very next line there after, the new value isn't available yet
+- because of this, if we console.log the variable right after we call the state updating function - we would see the old value 
+
+- but we do see that eventually the component is called again and is evaluated again, and that therefor we see our updated value on the screen
+- if you have data that might change, and where changes to that data should be reflected on the UI, then you need State
+- because regular variables will not do the trick
+- with state however, we can set and change values - and when they do change - React will re-evaluate the component in which the state was registered
+- AND ONLY that component, btw, not any other components  
+
+
+A Close Look at the 'useState' Hook
+------------------------------------
+- remember that we used a const to store the deconstructed value of the array that is returned by the useState() function (giving use our state variable and update state function)
+	-> useState registers some value as a state for the component in which it is being called
+	-> to be more precise, it registers it for a specific component instance
+		-> for example, if a listItem component is used multiple times within another list component
+		-> each one of these list items is a seperate instance of the listItem component
+		-> this means every item receives its own separate State which is detatched from the other States
+		-> there is one component definition, however, that definition is called multiple times - once for every instance
+		-> every time it's called, a new separate State is created (in the same way, but managed independently by React)
+		-> this means that if we change some content in one instance, the others ones are not effected - because they have their own state
+		-> its on a per component instance basis - important to keep in mind
+
+	-> in addition, whenever State changes, it's only the component function, and only that specific instance(where the component is being used) where React will re-evaluate it
+
+- but why are we using const when we do eventually assign a new value?
+	-> keep in mind that we are not assigning value with the equal sign - that would indeed fail
+	-> when we update a State, we call the state updating function
+	-> the concrete value is simply managed somewhere else(?) by React
+	-> by calling useState, we tell React that it should manage some value for us - we never see that variable itself
+	-> therefor we just call a function, and we never assign a new value to the state variable with the equal operator
+	-> therefor, using a const is absolutely fine
+
+- how do we get the latest title value then?
+	-> keep in mind that the component function is re-executed when the state is updated
+	-> which means that the line of code that we use to deconstruct the useState returned array value is also executed again
+	-> so if we call the state updating function, and we assign a new value for the state (which React manages somehwere else)
+		-> it leads to the component being called again
+		-> therefor, the new value of the state is fetched from React (which manages the state for us) 
+		-> and the 1st variable we are using to hold the deconstructed return value of useState is update(technically assigned) with this value 
+		-> so we always get a brand new snap shot of that state when the component function re-executes
+
+- you might be wondering if this means that we always overwrite any state changes with our initial value passed to useState() 
+	-> the answer is no
+	-> this is because React keeps track of when we call useState in a given component instance for the first time
+	-> when we call it for the first time ever, useState takes the argument you passed as the intial value for the State variable
+	-> however, if a component is then re-executed because of a State change, React will not reinitialize the State with that argument
+	-> it will instead detect that this State had been initialized in the past - and will just grab the latest state, and give us that state instead
+
+- there is a lot of details on how state works under the hood, in a nutshell though - using state is simple
+	-> you just register state with useState()
+	-> you always get back two values: the value itself and the updating function
+	-> you call the function whenever the state should change
+	-> and you use that first element (the state variable) when ever you want to use the state value e.g. for outputting it in the JSX code
+	-> React will do the rest
+		-> it will re-execute the component function, and re-evalute the JSX code when ever the state changes
+
+- state is such an important concept because it adds reactivity to our application
+- without state, our user interface would never change 
+- with state, and with listening to events, we can make sure that we can react to user input
+- and that such input can result in a visible change on our screen
+
+
+Adding Form Inputs
+------------------
+- we have the capability to gather user input 
+- note that we have different groups of components which should be sorted into different folders
+- for example, we might have a folder for components that display data, and another folder for components that collect user data
