@@ -281,7 +281,7 @@ Passing Data via "props"
 	-> we want to make these child components configurable from outside
 	-> the data should not be stored inside of them, but instead be passed from outside, which we can do with the props concept 
 	-> in the parent component, we can simply add attributes to the child custom html elements
-	-> we do this the sme way we would add attributes to a regular element
+	-> we do this the same way we would add attributes to a regular element
 		> name of the attribute (can be named as we like)
 		> followed by an equal sign
 		> followed by the value we want the attribute to contain
@@ -290,8 +290,9 @@ Passing Data via "props"
 	-> once these attributes have been added to the child component in the parent file's JSX, it means we have essentially passed them
 	-> now in the child components file, we have to access them in order to use them - we do this through parameters
 	-> React insures that we get one parameter in every component that we use - which would be an object that holds all of the passed properties(attributes)
-	-> this object is called 'props' (can be named anything but props is conventional), which is passed to the child component's function declaration as a parameter (in the child components file)
-	-> calling it props makes it clear that it is the object that hold all the values we get from the attributes that were passed to our custom element in the parents JSX
+	-> This object is automatically passed as a parameter, however, we have to name it within the parenthesis in order to access it (kind of like events (e))
+	-> we name this object 'props' (can be named anything but props is conventional), which is passed to the child component's function declaration as a parameter (in the child components file)
+	-> naming it props makes it clear that it is the object that hold all the values we get from the attributes that were passed to our custom element in the parents JSX
 	-> the prop contains key-value pairs
 		> the keys will be the attribute names that were passed
 		> the values will be the values set on those keys 
@@ -305,7 +306,7 @@ Passing Data via "props"
 - So we're not defining the data inside of the child component (the component that ultimately uses the data in it's JSX directly)
 - instead, the data is defined in the parent component, and passed into the child component through attributes
 - we are then accessing these attributes in the child components file by accessing the props object using simple dot notation
-- this makes components truly reusable and configurable
+- this makes components truly reusable and configurable (allows them to work like normal functions, in the sense that they provide different results based on the arguments(props) that are passed)
 
 
 Adding 'Normal' JavaScript to Components
@@ -332,8 +333,8 @@ Splitting Components:
 - once created, we can replace our old JSX with the new custom component after importing it into the file
 - note that if there is no content between opening and closing tags of the custom component, you can just write it with a self closing tag
 
-- the biggest takeaway from this is understanding that you can pass props from app.js to a child component, then from that child component its own child component etc
-- sometimes you need to make a component just to pass data to a another component insdie of it, which is totally fine
+- the biggest takeaway from this is understanding that you can pass props from app.js to a child component, then from that child component to its own child component etc
+- sometimes you need to make a component just to pass data to a another component inside of it, which is totally fine
 
 
 The Concept of "Composition" ("children props")
@@ -343,7 +344,7 @@ The Concept of "Composition" ("children props")
 - these components are just configured through props (fairly standard, very common in react apps)
 - sometimes, we want to have a component where you don't configure everything through props
 - instead, we are able to pass content between the opening and closing tags of that component
-- for now, we can refer to this as a shell component (or a wrapper component), because it will be used as a wrapper around other components
+- for now, we can refer to this as a shell component (or a wrapper component), because it will be used as a wrapper around other components (like a containter)
 
 - Shell/Wrapper Components can help reduce code duplication
 	-> the idea of having components is to have reusable building blocks, also to avoid code duplication
@@ -365,7 +366,8 @@ The Concept of "Composition" ("children props")
 - The shell component acts as a container/wrapper
 	-> now that its CSS file has been imported, the shell component will have the shared styles applied
 	-> this shell component will not be configured through some attributes (props)***
-	-> instead, we would replace the root div of our original components with this shell component
+	-> instead, we would replace the root div of our original components with this shell component (I use the term root div wrong here, but I mean the main div of the component when I say this)
+	-> NOTE: might not even be needed as the main div, could maybe even be used as a child div, im not sure - but it is just a container so it makes sense that it would
 	-> this allows us to get these predefined styles automatically
 	-> in order to be able to use this shell component in another component, we need to import the shell components file
 	-> but we need another step to make this work, because by default, you can't use custom components as wrappers around content 

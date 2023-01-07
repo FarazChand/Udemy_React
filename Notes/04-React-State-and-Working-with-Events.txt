@@ -68,7 +68,7 @@ How Component Functions are Executed
 	-> when our webpage is visited, the React app is loaded
 	-> it might not look like it because of syntactic sugar, but in our index.js - we are actually calling that App component
 	-> this subsequently ends up calling all the nested components which end up returning JSX, which eventually get rendered to the page
-	-> the problem with this is that it renders once
+	-> the problem with this is that it renders once (initial render, using the initial data)
 	-> so when we change the content of something after this render has happened, it will not appear on the screen, because it has already rendered in its original state
 	-> in order for the change to appear, it would need to re-render again
 	-> we need a way of telling react that something changed and that a certain component should be re-evaluated
@@ -96,7 +96,6 @@ Working with State
 	-> this is a key difference between using a regular variable to store content value
 	-> we use this useState function by calling it inside of our component function
 
-
 - useState is a so called 'React hook'
 	-> there are other hooks as well, but useState is one of the most important ones
 	-> all the react hooks can be identified by the fact that they start with the word 'use' in their name
@@ -106,7 +105,7 @@ Working with State
 	-> the MUST be called DIRECTLY inside such component functions
 
  - useState requires a default state value
-	-> with useState, we basically create a special kind of variable
+	-> with useState, we basically create a special kind of variable (stored in a different place in memeory, managed by react)
 	-> if this variable changes, it will lead to the component function being called again
 	-> we therefor assign an initial value for that special variable 
 	-> we can pass it a value of the relevant prop, 
@@ -118,7 +117,7 @@ Working with State
 	-> instead we will be assigning new values by calling a function
 
 - useState actually returns an array, it actually always does this
-	-> the first value is the special variable itself - representing the current state value	
+	-> the first value is the value of the special variable itself - representing the current state value	
 	-> the second value of the array is the updating function - to update the state
 	-> we can use array destructuring to store both values into seperate variables or contants
 		eg. const [title, setTitle] = useState(props.title);
@@ -168,8 +167,8 @@ A Close Look at the 'useState' Hook
 	-> useState registers some value as a state for the component in which it is being called
 	-> to be more precise, it registers it for a specific component instance
 		-> for example, if a listItem component is used multiple times within another list component
-		-> each one of these list items is a seperate instance of the listItem component
-		-> this means every item receives its own separate State which is detatched from the other States
+		-> each one of these list items is a seperate instance of the listItem component, though they have the same function definition
+		-> this means every item receives its own separate State which is detatched from the other States (assuming useState is used within the component)
 		-> there is one component definition, however, that definition is called multiple times - once for every instance
 		-> every time it's called, a new separate State is created (in the same way, but managed independently by React)
 		-> this means that if we change some content in one instance, the others ones are not effected - because they have their own state
@@ -191,7 +190,7 @@ A Close Look at the 'useState' Hook
 	-> so if we call the state updating function, and we assign a new value for the state (which React manages somehwere else)
 		-> it leads to the component being called again
 		-> therefor, the new value of the state is fetched from React (which manages the state for us) 
-		-> and the 1st variable we are using to hold the deconstructed return value of useState is update(technically assigned) with this value 
+		-> and the 1st variable we are using to hold the deconstructed return value of useState is updated(technically assigned) with this value 
 		-> so we always get a brand new snap shot of that state when the component function re-executes
 
 - you might be wondering if this means that we always overwrite any state changes with our initial value passed to useState() 
@@ -215,8 +214,62 @@ A Close Look at the 'useState' Hook
 - and that such input can result in a visible change on our screen
 
 
+State can be updated in many ways:
+- Thus far, we update our state upon user events e.g. upon a click
+- that's very common but not required for state updates
+- you can update states for whatever reason you may have
+- another example is waiting for Http request to complete - updating the state based on the http response we get back
+- can also update state because of a timer
+
+
 Adding Form Inputs
 ------------------
 - we have the capability to gather user input 
 - note that we have different groups of components which should be sorted into different folders
 - for example, we might have a folder for components that display data, and another folder for components that collect user data
+
+- we can gather user inputs by using a component that returns a form
+- creating the component is pretty straight forward, its the same process we have already covered:
+	-> creating the component file, naming it appropriately 
+	-> importing the correct things (react library and css)
+	-> writing the JSX that we want to return 
+	-> exporting it correctly
+- other than this, its pretty straight forward HTML basics that we are writing within our JSX in order to create the form
+	-> a form container
+	-> other containers for structure if needed (check our project, we actually use a 'controls' wrapper, with other 'control' wrappers around each input and label pair)
+	-> we obviously have the our desired classNames and styles on these elements
+	-> we have input and label pairs where our user can enter values
+	-> a button to submit the form
+
+This is crucial groundwork, however, everything so far is basic html (maybe some confusing stuff, nothing too compicated - check the project)
+	-> maybe brush up on the default html attributes for input elements if needed
+
+Once we have created our form component, we can then use our form component in app.js within it's JSX
+- import it to app.js using the correct pathing
+- use the custom html form element in the desired location
+
+We now have a form component, however, the component is not doing anything
+- our next goal is to make sure we can gather the inputs that the user provides
+- we do this so that we can log these values to the console (for a start) 
+- the next step would be to take the gathered input values and combine them into a new expense object
+
+ 
+Listening to User Input:
+------------------------
+- we simply add listeners to the input elements that listen for a change
+- we can do this by adding a prop that starts with 'on', as we've learned previously
+- we can use onInput which reacts to every keystroke
+- there is also the onChange event which does the same thing, but works on all input types including things like dropdowns
+- once we pick an event to listen too, we have to now point at a function that will be executed when this event occurs
+- this function should be defined within the component function, before the return - assigned to a variable which we then use as embedded code that represents the function we want to be executed
+
+- now remember that in vanilla javascript, within our event handler - we can get access to an event object that describes the event that occurs
+- this event object is automatically available, you have to create an identifier for it in the parameter of the event handler's definition to use it though (e or event is the convention)
+	-> this is simillar to getting access the the props object that all components have
+- this is the case with our event handler that we are pointing to in our input element
+	-> since we passed this function to react through the onChange prop - react and the browser will make sure that we get such an event object when this change event occurs 
+	-> we can log this object to see what is inside it
+	-> a useful property of this object would be event.target.value 
+		-> target points at the DOM element at which the event occurs
+		-> the input element has a long list of properties, one of which is 'value'
+		-> this value property holds the current value of this input at the point of time this event occurs
