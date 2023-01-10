@@ -1,0 +1,196 @@
+Intro
+-----
+- we now know how to build components and work with multiple components
+- we know how to work with state and how to handle user events
+- in this section we will learn about Rendering Lists and Rendering Conditional Content
+	-> we will look at how we can output arrays of data on our page
+	-> and how we can show different content based on different conditions
+
+
+Rendering Lists of Data
+-----------------------
+- so far we have worked with a list of data, but it has been a static list
+- a dynamic list would be something that would change after some user input e.g. adding an item or changing a fitler
+- we currently know how to render our list of data by individually adding each item component in our list components JSX code
+	-> this is not dynamic at all
+	-> in most web applications, we don't know how many items we wanna render
+	-> hardcoding the list of items is not the way to go, we want to instead render that list dynamically
+	-> doing this is a standard practice, and is also straightforward to do with React
+
+
+How does this work
+- in an application that has the main app component, a list component, and then an item component(that renders individual items of the list)..
+- our list data might be stored in app.js, the top of the component tree - stored as an array of objects containing the list data
+- if we want to render our list data in the list component, we have to pass our data down to the list component via props
+- we don't want to output the array as text or anything like that, instead we want to render one item per element in the array
+	-> straight forward to do this, we start within our list component, within its JSX, within the div that represents the list container
+	-> we need curly braces in order to execute a dynamic expression within our JSX code (embedded)
+	-> the expression we want to execute here is to reach out to the array of list data
+		-> for every element within this list data, we want to create a JSX element(item component)
+		-> we can do this by accessing the array within our dynamic expression
+		-> it was passed from app.js, so we access it through the props object
+		-> we then call a built in JS method on this array called 'map'
+			e.g. {props.listData.map()}
+
+Map Method Refresher
+- remember that the 'map' method creates a new array based on another array 
+- it also transforms every element in that original array based on the function we pass it
+- so the map method takes a function that we pass, and that function is executed for every item in the array on which we are calling map
+- the result of that function is the element which will be added to the newly created array
+
+
+
+
+We can use the map method on the array of list data to transform our array of objects into an array of JSX elements
+	-> to be more precise, we want to transform each object into an item component
+
+Note that if an array of JSX elements are within a dynamic expression, React is capable of rendering these elements
+	-> so if we had an array of JSX elements as part of our JSX code, React would simply render its elements side by side
+	-> we utilize this to transform our list's array of objects into an array of item components which are then rendered by react
+		-> map takes a function as an argument
+		-> that function executes for every element in the array
+		-> the passed function gets the element for which its currently executing as an argument
+		-> something is then done to that element before it is returned and stored in a new array(we define this in the map method)
+		-> after every element goes through that process, the new array that was created by this process is retruned by the map method
+
+In the case where we are mapping over our list of data, which is an array of objects...
+	-> the function we pass to map uses each object as an argument, starting with the first object in the array and ending at the last
+	-> each object we are passing holds the data for each corresponding item we want to render
+	-> we define in the map method that we want to use each object to render an item component
+		-> this is done by having the return value of the function we pass into the map method, return an item component
+		-> we pass the relevant data from our object as props to this item component 
+			e.g. {props.listData.map(itemObject => <ListItem title={itemObject.title} />)}
+		
+		-> this process happens for every object in the array of list data 
+		-> once the process is done, a new list of item components with the relevant data passed as props is returned
+		-> this new array of components is located within the dynamic expression curly braces, meaning that it will simply be rendered by React
+
+Once this is complete, all of the items will be rendered just as before, except that they will be rendered dynamically this time.
+	-> this means that it is based on the actual array, not on hardcoding components and passing specific props
+	-> this also means that if this array is changed, it will be reflected in that list (without having to hardcode another item component)
+		
+
+Using Stateful Lists
+--------------------
+- we might want to update the list data that we stored in app.js (the array of objects in the app component)
+- we might want it to update when ever a new item is being added
+	-> a form element in a lower component might be filled up, and the data might be sent up through functions passed as props, all the way up to app.js
+	-> we then have a handler within the app component to handle when a new item is added through this form child component
+	-> this data is probably in the form of an object
+
+- if we add this object representing the new item data directly to the array of list data in the app component
+	-> no changes will be reflected in the UI
+	-> this is because nothing re-renders
+	-> in order to do this - we need to use State
+
+	-> in app.js we want to import useState from the React library so that we can register some state using the useState function
+	-> we also want to remove the list data from the component definition and store it the as a global constant (dummy data, not 100% explained why)
+	
+	-> inside of the app component, we call useState and pass our dummy data as the initial value of the State
+	-> we desctructer the array that we receive from useState and give the two values appropriate names
+	-> in the event handler that deals with receiving a new item object (adding a new item) we want to call the state updating function
+	-> since we are depending on the previous state in this case, we want to use the special function form of the state updating function 
+		-> remember that this means we pass a function as an argument which automatically receives the latest state snapshot
+		-> we want this function to return an array with the new item object AND the previous state snapshot SPREAD into the array
+		-> this will make the new state have all the previous data plus our new data
+	
+	-> as long as the rest of our code is set up correctly to pass our state to the item components, this new item will now be rendered to the UI along with the rest of the list
+
+- this means that we now have a dynamic list that automatically updates when items are added
+
+
+Understanding 'Keys'
+--------------------
+- at this point, we might be getting a warning about each child needing to have a unique 'key' prop (or rather should have it)
+- react has a special concept when it comes to rendering lists of data
+- this concept exists to ensure that React is able to update and render such lists efficiently without performance losses or bugs, which may occur
+
+- theres a problem with our current implementation 
+- when we add a new item to a list, React renders this item as the last item in the list of divs
+- .. as well as updates all items and replaces their content such that it again matches the order of the items in the array of our list data
+- this is not efficient because it essentially just adds a div then walks through every item, updating each of the items content in order to match the array
+- the final result is correct, but in terms of performance, its not great
+	-> all items are visited and updated
+	-> can lead to bugs (when items are using state, new items can overwrite them.. something like that idk)
+
+Why does React behave like this?
+- its the only way it can do it by default
+- the individual items all look similar to React, so it can't know hwere a new item shoud be added
+- that's why we get this warning, because we have a way of telling React where a new item should be added
+
+- we do that by going to the place where we ouput our list of items (the map method in the list component)
+	-> we add a special prop to the item component that we are returning from this method
+	-> this prop is the 'key' prop
+	-> this is not a prop that we are using inside of this item
+	-> instead, it's a prop you can add to any component, no matter if it's a custom component by you or if it's a built in HTML element, you can always add this
+	-> if you do add this prop to an element, you can help React identify indiviual items
+	-> in order to do this, you need to set a unique value per list item e.g. an ID set using Math.Random
+		-> this ID would probably be a property of the objects in the list array
+	-> if you have no ID, you can use the second argument of the map method, which is the index of the current iteration of the array that it is called on
+		-> it is discouraged to use this because you can still run into bugs
+		-> this is because the index for a given item is always the same and not directly attatched to the content of the item
+	-> For the ID, that's different.
+		-> Every item with a certain content has a clear unique ID
+		-> it turns out in most scenarios that you do have some unique ID
+		-> typically you are rendering some data that comes from a database or anything like that - and there you work with unique IDs anyways
+		-> therefor, finding some unique identifier is no problem
+		-> you can use any primitive value as an identifier
+
+React is now able to uniquely identify all of the items of the list, and is therefore aware, not just how long the Array is but also where which items should be placed
+This allows the list ot be updated in a more efficient way}
+TLDR you should always add such a key when mapping out lists of items
+
+
+Getting the Filter to Work
+--------------------------
+- we might want to filter what items show up on the webpage based on some value that we pick from a drop down menu
+- this drop down menu would most likely be a child component of the list component
+- we already went over how to get user input and raise the state to the parent component
+- we simply would do this with a the filter drop down component - raising the value of its event to the parent component and storing it as state there
+- remember that the list component also would have the array of list data passed to it as a prop from the app component
+
+- with both the list data and the filter value, we can create a new array that is filtered by the filter value
+- we don't want to mutate the original state of the array of list data, we don't want to overwrite anything
+
+- we can simply do this by creating a new variable that we intend to hold this new array
+- the value of this variable would be our array of list data, filtered by the filter() method.
+- the filter method itereates through the array its called on and returns a new array of elements that pass a condition we define
+- in each iteration, the condition we would check for is to see if the relevant property of the current element of the list data is equal to the filter value
+- any elements that pass this condition would be returned to the new array
+
+- now instead of rendering the original list data, we instead render this new array to the webpage
+- so only items that have the filter value are rendered, and if the filter value changes, so does what is rendered on the screen
+
+
+Outputting Conditional Content
+-------------------------------
+- when using our filter above, there might be cases where there is no data to show for the given filter value
+- in this case, we would probably want to show an appropriate message/visual in order to represent this
+- this is where the concept of conditional content comes into play, which is an important concept
+
+- conditional content is about rendering different content under different conditions
+
+For our above example:
+- we could either handle the logic within the return statement, or before the return statement
+- we could use the terinary operator to check if the filtered array's length is === 0
+	-> if it is, we would  render a simple message in a <p> element
+	-> if not, we would render the items of the array (as we did before)
+	-> this would all happen within the same dynamic expression
+- we could use short circutting to do the same thing
+	-> this would be split into two dynamic expressions
+	-> the first one would see if the array's length === 0, if it is, render a message
+		e.g. {filteredItems.length === 0 && <p>...</p>}
+	-> the second one would see if the array's length > 0, if it is, render the array's items
+		e.g {filteredItems.length > 0 && filteredExpensees.map(..)...}
+
+- we could do this before the return statement to make our returned JSX cleaner
+	-> note that we can write JSX before the return statement as well, we are not limited to writing it in the return statement
+	-> we can take advantage of this and make our JSX cleaner (subjective)
+	-> we can create a new variable and assign it a default value for when no items are in our filtered array
+	-> we can then also create an if statement that checks if any items are in the filtered array, and if they are, set the above value to the rendered JSX of that array
+	-> we then use this variable within the relevant location of our return statement, where it will render the JSX based on the logic above(max thinks this is the cleanest)
+
+
+Adding Conditional Retrun Statements
+-------------------------------------
+- we might want to extract the above logic from it's current component and instead create another component, in order to make things a little bit leaner

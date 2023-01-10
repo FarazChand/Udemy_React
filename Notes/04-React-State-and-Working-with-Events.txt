@@ -256,8 +256,8 @@ We now have a form component, however, the component is not doing anything
  
 Listening to User Input:
 ------------------------
-- we simply add listeners to the input elements that listen for a change
-- we can do this by adding a prop that starts with 'on', as we've learned previously
+- we simply add listeners to the input elements that we want to listen for a change
+- we can do this by adding a prop that starts with 'on', as we've learned previously - followed by a relevant default JS event
 - we can use onInput which reacts to every keystroke
 - there is also the onChange event which does the same thing, but works on all input types including things like dropdowns
 - once we pick an event to listen too, we have to now point at a function that will be executed when this event occurs
@@ -265,7 +265,7 @@ Listening to User Input:
 
 - now remember that in vanilla javascript, within our event handler - we can get access to an event object that describes the event that occurs
 - this event object is automatically available, you have to create an identifier for it in the parameter of the event handler's definition to use it though (e or event is the convention)
-	-> this is simillar to getting access the the props object that all components have
+	-> this process is simillar to getting access the the props object that all components have
 - this is the case with our event handler that we are pointing to in our input element
 	-> since we passed this function to react through the onChange prop - react and the browser will make sure that we get such an event object when this change event occurs 
 	-> we can log this object to see what is inside it
@@ -273,3 +273,187 @@ Listening to User Input:
 		-> target points at the DOM element at which the event occurs
 		-> the input element has a long list of properties, one of which is 'value'
 		-> this value property holds the current value of this input at the point of time this event occurs
+
+
+Working with Multiple States
+----------------------------
+- we can listen to multiple user inputs by adding listeners to multiple input elements
+- we can use the values returned by the events we are listening to in diffferent ways
+- one way to use these values is to store them for later, so that when the form is submitted - we can use these values
+- an example would be to store /track all values for all inputs and then combine them all into an object once the form is submitted 
+- one way of storing the value and ensuring that it persists (even if the component function is re-executed) - we can use State
+
+- we would just have to set the initial state for the input element we are tracking to an empty string (using useState function before the return statement)
+- its an empty string intially because when the input elemnt is rendered for the first time, nothing will be entered by default
+	-> note that when you listen to a change event for an input, if you read the value of that input element - it will always be string
+	-> even if it stores a number or a date, it will be a number as a string
+- remember that we destructure the returned value of the useState function, which always returns an array with 2 values that represent the state value, and the updating state function
+- we name these with relevant names e.g. for a title input element, we would name it's state variable 'enteredTitle' and the function 'setEnteredTitle'
+- we can then add this state updating function within the input element's event handler's function definiton
+- we would pass the event.target.value as the argument for the state updating function - thus keeping track of the current value entered and updating it to the State
+- note that we are not doing this in order to re-execute the componenet, however, it will be re-executed anyways 
+- for the moment, our purpose of doing this is to make sure the user input data persists
+- there are other ways to do this, but this way works great
+
+- this can be done for multiple user inputs at a time, using the same process (obviously naming identifiers respectively)
+- we can call useState multiple times in the same component, this does not cause any issue
+- essentially, we can create a seperate state for each of our input elements data, and use the event listener/handler on that element to keep it updated
+
+- using multiple states in the same component is something that is common and that is absolutely ok
+- we can have this seperate states and update and manage them separately
+- there is the question of if we should use multiple states vs a single state ... 
+
+
+Using One State Instead, whats better?
+--------------------------------------
+- we could use one state instead of multiple states
+- this is done by calling useState only once - and passing in an object as an argument
+- in this object itself, you could group together your three states
+- this is done by making a key-value pair for the data of the input element you want to track e.g. title: '',
+- the logic is simillar but instead everything is now in one state object managed as one piece of state
+
+- the difference now is that whenever you update this state you need to update all three properties and not just one
+- we deconstruct the return of useState as usual, the value we receive represents the State value - which is the object that holds our input key-values
+- within each of our event handlers for the different input elements we are keeping track of:
+	-> we call our stateUpdating function (which will update our state value - which is the object mentioned before)
+	-> we pass it an object (to allow it to continue functioning as a single state)
+	-> we then spread(...) our current state object (if we skip this step, we will overwrite the entire state with a single value - no beuno)
+	-> we then overwrite the relevant key-value pair for the event we are handling 
+	-> this gets the job done, however it is not perfect yet (will revisit soon)
+
+- both single state and multiple state are valid to use, its up to personal preference which one to choose 
+- individual state slices are more common to come accross, Max likes to use these - I do to 
+	-> seems like less code in the end, less complexity in terms of not having to deal with an object
+	-> also allows other advantages when in comes to naming and storing these values in a data object later down the line
+
+
+Updating State that Relies on the Previous State
+-------------------------------------------------
+- the way we update our single state above is not entirely correct
+	-> it technically would work, but in niche cases it could fail
+	-> it's simply not a good practice to update state like this
+	-> we are depending on our previous state for updating the state in the single state approach
+	-> this is because we are copying the values from our previous state in order not to lose them, and just updating the relevant value
+
+- when ever we update state, and we depend on the previous state 
+	-> for e.g. in the single state approach OR if we were managing a counter
+	-> we should use an alternative form of the state updating function
+	-> we call it the same way, but we pass in a function to the state updating function
+	-> for the function that we passed, we give it an argument that we call 'prevState' 
+	-> 'prevState' arugment represents a snapshot of the previous state for which you are calling the updating function
+	-> within this passed function, we should return the new state
+	-> in the above case single state case, it should be an object 
+	-> within this object we would spread the prevState argument (copying our old objects key-value pairs)
+	-> then we overwrite the relevant value
+
+- we do it this way because of how react updates the state
+	-> keep in mind that react schedules state updates, it doesn't perform them instantly
+	-> therefor, theoretically if you schedule a lot of state updates at the same time, you could be depending on an outdated or incorrect state snapshot using our original approach
+	-> if we use our new approach, react will gaurantee that the state snapshot it gives you (prevState) will always be the latest state snapshot
+	-> it does this while keeping all scheduled state updates in mind
+	-> this is the safer way to insure that we always operate on the latest state snapshot
+
+- this is a key concept that we will run into when using react
+
+
+Handling Form Submission
+------------------------
+- so far, we've been over how to collect data as well as how to insure that data persists using State
+- because we have the ability to collect and store data, we can now utilize it (manipulate and move) as well
+
+- one way to utilize this data is to combine them into a single object - allowing us to manipulate/move all the user input together 
+	-> a simple example is combining the data into an object, then console logging it
+	-> we could also enrich this data or move it to another component (more on this later)
+
+- assuming our input elements are contained within a form element, we can program the utilization of our collected user input data through the 'submit' event
+	-> this is a default behavior built in to the browser and built into forms
+	-> the submit event is an event available to forms that we can listen to
+	-> it is triggered when a button element on a form with this event listener is clicked
+	-> this button usually has the type of submit (type is a property)
+	-> this causes the overall form element to emit the submit event - which we can listen to
+	-> we add this listener to our form element's attributes (onSubmit)
+
+- like every event listener, we pass a handler function to handle the event when it occurs
+	-> as usual, we define our event handler in our component function definition before our return statement
+	-> this is a default browser behavior, part of this default behavior is to reload the page when the event happens
+		-> the browser automatically sends a request whenever a form is submitted to the server which is hosting the webpage
+ 		-> this is usually not the behavior that we want
+		-> instead, we want to handle the submission with JS, and manually collect and combine the data in order to do something with it
+		-> thankfully we can prevent this default behavior
+	-> remember that an event object is created and passed to our handler when an event we are listening for occurs
+		-> on this object, we can call a method that prevents its default behaviour
+		-> the method below will prevent the default behavior of the page reloading (because it prevents any request that would have been sent due to this event)
+		-> this allows us to coninue handling this with JS
+		e.g. event.preventDefault();  
+	-> we can then create a new variable that holds an object where we can store all of our collected data (using our desired identifiers - with their values as the collected data)
+	-> for dates, the value we would assign would be the new Date() function
+		-> we would then pass the date data that we collected from the relevant user input element (which is always a string)
+		-> this parses the date string and converts it into a data object
+
+
+Adding Two Way Binding
+-----------------------
+- once we have submitted and collected the data, we probably want to clear the input fields on the webpage
+- since we are using state to keep track of the data, we have an advantage
+- we could have used global variables outside of the component function if we just wanted to persist the values
+
+- since we used state, we can implement something called two way binding
+	-> this simply means that for inputs we don't just listen to changes - but we can also pass a new value back into the input
+	-> this allows us to reset or change the input programmatically
+
+- in order to implement two way binding all we have to do is add the value attribute to an input element
+	-> this attribute sets the internal value property (which every input element has)	
+	-> this allows us to set it to any value we want
+	-> we set this value to the state value of the input element 
+	-> this is now two way binded
+		-> now we don't just listen to changes in the input to update our state
+		-> we also feed the state back into the input
+		-> now, when we change the state - we also change the input
+		-> this might sound like an infinite loop but it actually isnt - there is no problem there
+
+- the advantage of having an input element two way binded
+	-> we can call the state updating function for the data associated with the input element at the end of the submit handler
+	-> when we do this, we can set the value of the state back to an empty string
+	-> this will reset the input field in our UI
+
+
+
+
+---skipped some notes, go back and take them---
+
+
+Controlled vs Uncontrolled Components & Stateless vs Stateful Components
+------------------------------------------------------------------------
+- when ever you use two way binding you are controlling a component
+- we can even control our own custom component(look at the practice for this section.. ExpensesFilter.js two way binding between two custom components)
+	-> we can listen for an event in a child component's input element
+	-> pass the relevant event data to the parent component (through props)
+	-> handle that event in the parent
+	-> pass the result back to the child component (through props)
+	-> use that result as the value attribute for our child component's input element
+
+- this means that the value which is used in the child component (such as a value selected in a drop down) is passed on to a parent component through props and is received from the parent component
+	-> both the currently set value, as well as the function which in the end handles the selected value is not part of the child component
+	-> the child component is really just a component that presents the UI
+		-> also attatches a couple listeners or props
+	-> the real logic resides in the parent component
+	-> that turns this child component into something which is called a 'controlled component'
+
+- technically there is no difference
+	-> this controlled component is still a regular component	
+	-> its just a special term that when you see it basically means:
+		-> both the value and changes to the value are not handled in the component itself, but in a parent component
+	-> essentially, the parent component controls the child component
+
+- Another term/concept you should be aware of is about presentational verses stateful components
+	-> aka stateless vs stateful components.. or dumb vs smart components
+	-> in basically all React apps which you're building, you will have a couple components that manage some state
+	-> you will also have other components that don't manage any state
+	-> in most React applications you will have more presentational/dumb components than smart/stateful components
+	-> dumb and smart are just terms, they are not negative or positive 
+
+- you want to split up your application into small reusable pieces
+	-> most components will only focus on outputting something
+	-> only a couple of components typically do manage state, which is then spread out and distributed through props
+
+
