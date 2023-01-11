@@ -191,6 +191,108 @@ For our above example:
 	-> we then use this variable within the relevant location of our return statement, where it will render the JSX based on the logic above(max thinks this is the cleanest)
 
 
-Adding Conditional Retrun Statements
+Adding Conditional Return Statements
 -------------------------------------
 - we might want to extract the above logic from it's current component and instead create another component, in order to make things a little bit leaner
+(NOT FINISHED)
+
+
+Demo App: Adding a Chart
+------------------------
+This is just a walkthrough of how we added a chart to the expense app during the course:
+
+- we might want some graphical representation of our data 
+- we can store this component in its own folder called Chart
+- we gave this chart folder two main components - the chart itself, and th charBar (along with their css files)
+- we do the normal set up for a component (imports, exports, function definition)
+
+- we can create a flexible chart that is not restricted to months and to 12 data points
+	-> we could say that when the chart component is being used somewhere in our application...
+	-> ...we want to receive the data points that should be plotted - as props
+	-> this makes the chart component fairly configurable
+	-> also, the components that use the chart component can decide how many data points (and) with which values should be renedered
+	-> therefor, we should output the ChartBars dynamically by going through an array of data points..
+	->... and mapping every data point to a ChartBar
+	-> this involves outputting lists of data dynamically (like we've learned above)
+	-> this creates as many ChartBar components as we have data points
+	
+	-> we want to pass some data into the ChartBar component to control how it will be rendered 
+	-> for this we want to extract some data from the incoming data points
+	-> since at this point, we haven't used the Chart or CharBar components in our application, we can predefine what props we want to pass
+	-> one prop would be 'value', which we would obtain its value from the data point we pass 
+		-> this means that when we define the data points later, we need to make sure they all have a value property
+		-> in other words, the data points are objects which have a value property
+	
+	-> we also want every ChartBar to plot the value in relation to the maximum value in the entire chart
+		-> this means that we also want to pass in a 'maxValue' property, which we can set to null as default for now
+		-> this is not data that we extract from the data point
+		-> this is a unique value which is the same for all ChartBars in a given chart  
+		-> we will need to derive this max value
+	
+	-> we also want a label for the month names, so we'll add a label prop
+	-> since we are mapping this, we should also add a key (as we learned before, the special key prop which helps render items efficiently)
+		-> we usually would set this as the ID value of the object..
+		-> but we can actually use the label in this case
+		-> we can say that the label should be unique, every ChartBar has its own unique label
+		-> therefore, we can also use the label as a unique identifier for this special key prop here
+
+
+Demo App: Adding Dynamic Styles
+-------------------------------
+
+Buidling the ChartBar component
+- normal creation process 
+- we add the required structure and classes to get our component to work the way we want to (not detailed in course, just provided)
+- we then want to use dynamic expressions within our return JSX to insert the values from the object we receive as a prop (as we went over above)
+
+- within the ChartBar component, we have a 'fill' div that determines how much the Bar should be filled
+- how much this bar is filled will depend on the 'value' key of our props object
+- we do this in relation to the maxValue, e.g. if max is 100 and the value is 50, the bar is filled 50%
+- this means that within the ChartBar component, we need to calculate how much this specific ChartBar instance should be filled
+	-> we can do this by creating a varialbe that we intend to store the value the bar should be filled at - giving it a default value of '0%'
+	-> this value should be stored as a percentage, but as a string - because it will be converted into css later e.g. const barFillHeight='0%'
+	-> we check if we have a prop.maxValue > 0 (we could have 0 if we filter for a month with no expenses)
+	-> if it is, we set the variable to the value / maxValue, then rounded and x 100 
+	-> this gives us the percentage by which the bar should be filled
+	-> we also want to convert this to a string with a percentage sign at the end (can be done with type coercion , adding the percentage sign string after the expression
+
+- once we have our percentage string, we want to use it to set the height of the CSS style height for this 'fill' div
+	-> to do this, we are going to set the style of an element dynamically
+	-> can be done by adding the 'style' prop to the element (which is an html default attribute as well)
+	-> this style prop works a little bit differently when building a react application
+	-> the style prop wants an object, since we have dynamic data, it will be inside of a dynamic expression 
+	-> in this object, you should use the CSS property names as key names and the values as values
+		e.g. style = {{'background-color': 'red'}}|
+	-> note that we don't need the quotes around the key, UNLESS there is a dash in between
+	-> also note that property names with a dash in them can be typed without the quotes if we remove the dash and convert the name to camelCase
+	-> we simply want to set the height to the variable we calculated before
+
+
+Demo App: Wrap Up & Next Steps
+------------------------------
+- we create another component which is intended to be the parent component of our Chart component
+- this component sets up the data points that will be passed to Chart
+	-> does this by creating an array of objects of datapoints
+	-> these datapoint objects contain a label for the month, and a value for the total expenses
+	-> there are 12 objects for the 12 months, and each value is initially 0
+- it does this by receiving the filtered expenses from the Expense component (which filters by year)
+	-> this means we get all the expenses of that year passed to the chart component
+	-> we also get the date value for each expense (passed from app.js as a prop down the chain to this component)
+- it then loops through the expenses using a for of loop (for arrays), checks each expenses Month  
+	-> does this by using the method .getMonth() on the date object we passed
+	-> note that this returns the month as a number -> starting at 0 for Jan up to 11 for Dec (like an array)
+	-> we can use this value to pick the correct object in our datapoints array (in that array, Jan object also has an index of 0)
+	-> we then use that month value to select the correct datapoint in our datapoint array
+	-> we update the datapoint's value property by adding the current expense's amount property (+=)
+	-> by the end of the for loop - we will have sorted all the expenses for that year in the correct datapoint object (the summed up values for the given month)
+
+- we also need to find the total max value
+	-> we will do this in our Chart component (after passing our datapoints array to it from CharExpenses.js)
+	-> we look through all the data points and find the biggest value
+	-> we do this by mapping through our datapoints array and returning a new array of just the values
+	-> we then spread this array as an argument inside of Math.max()
+	-> we then pass this maximum value as a prop to the ChartBar component in our return statement as a dynamic value
+
+- now we just have to use our ExpensesChart component in the Expenses.js file in order to render it
+	-> import it
+	-> pass the filtered expenses as a prop (using the correct prop name that we predefined while creating our ExpensesChart component)

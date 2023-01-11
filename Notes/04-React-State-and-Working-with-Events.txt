@@ -389,6 +389,7 @@ Handling Form Submission
 	-> for dates, the value we would assign would be the new Date() function
 		-> we would then pass the date data that we collected from the relevant user input element (which is always a string)
 		-> this parses the date string and converts it into a data object
+	-> if we are intending on storing a collected value as a number in order to use it for calculations later, we want to add a + before storing it in order to coerce its type to number
 
 
 Adding Two Way Binding

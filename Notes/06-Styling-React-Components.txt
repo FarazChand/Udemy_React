@@ -1,0 +1,10 @@
+Introduction
+------------
+- Though important, building web apps with React is not just about composing components together and making sure that the logic works correctly
+- Building React apps is also about styling those app
+- There are different techniques for setting styles dynamically, and so that other components are not affected by a specific component's styles
+
+In this module we will look at:
+	-> conditional & dynamic styles
+	-> styled components
+	-> CSS Modules
