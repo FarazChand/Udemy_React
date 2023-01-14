@@ -8,3 +8,251 @@ In this module we will look at:
 	-> conditional & dynamic styles
 	-> styled components
 	-> CSS Modules
+
+
+Setting Dynamic Inline Styles
+-----------------------------
+- we might want to change how styles are applied in an application
+- at the moment, we have been using regular CSS with regular CSS selectors
+- these styles are not scoped to their components - they would affect any component on the entire page that contain their className
+
+- we'll learn how to set style dynamically
+- e.g. collecting input by the user, and using a button event to change the UI based on the input
+- we don't want the UI to change in the same way if no input is received - we might want something different to let the user know they need to input somethingS
+- this needs to be done dynamically
+- this can be done in the function that handles the form submission 
+- we just check for empty input after trimming the value and if it is empty, we return without executing further
+- now we need to add something to let the user know they should be adding something - we can do this with adding some styles when this case arises
+
+- we can set a state for a variable that we intend to track whether an input is valid or not, and change its value depending on the validity
+- it would be a boolean value set to true by default
+- if something invalid is entered, we would change it to false with the same function in the last paragraph
+- we would then use our dynamic inline styles prop {{}} to set the relevant styles on the relevant elements 
+- we already learned that this prop expects an object with key value pairs that represent the styles we want to change
+- instead of just setting the style, we can use a ternary operator as our value - using it to check our valid variable
+- setting the style according to whether or not the 'valid' state variable is true or false 
+- this variabe can be refactored in the logic above the return statement if needed
+
+- now we just have to ensure that the styles are reset once valid input is eventually entered 
+
+
+- note that when we set inline styles, they have the highest priority in css 
+- so our inline styles would be overwritting our base CSS styles that we set in the css file
+- if we set the base styles again in our inline styles for valid input, it would be duplicated the code in css file that was already set (not DRY)
+- though this still works, there is an alternative to setting styles like this - one that avoids this duplication and overwriting
+
+
+Setting CSS Classes Dynamically
+-------------------------------
+- there is an alternative to setting inline styles
+- we could add a new css class to the div that contains the elements we want to change
+- we would only add this class if a certain condition is met/failed (like above, where the input is invalid)
+- the name of this class is up to us, e.g. 'invalid' as a class name for when the input is invalid
+
+- we can then prepare the the fitting styles in our css file
+	-> we would just select the div that contains the elements we want to change
+	-> use a combinator to make sure it also has the invalid class
+	-> then use another combinator to select the specific element
+	-> we then just apply the styles as usual
+		e.g  (in css file) containerDiv.invalid targetElement {....}
+
+- in order for these styles to be applied correctly, we have to add the class dynamically when the condition is met
+	-> we can do this using a dynamic expression as the value of the className prop of the div that contains our targeted elements
+	-> within our dynamic expression, we can then use a template literal (``)  and add a dynamic value using ${} within the template literal
+	-> ${} works like our {} in our JSX, meaning we could insert any JS expression into the braces and it would work 
+	-> using this, we can now add an ternary expression that allows us to check if isValid is false
+	-> we then either add the 'invalid' class if it is, or an empty string if it isnt 
+
+	-> we can also add as many of these ${} dynamic values within these backticks 
+	-> these means we can add as many dynamic values within our dynamic expression
+	-> this allows us to add as many classes dynamically as we need!
+
+	-> this is very powerful because we are back to working with classes and css files only
+	-> we can dynamically add or remove classes with this simple syntax
+	-> React adds and removes the classes in the DOM, we just specify the end goal and alternative states
+
+
+Introducing Styled Components
+-----------------------------
+- currently, we are using just CSS to deal with styles
+- we are just using regular CSS files and selectors - mostly class selectors but also some tag selectors
+- we are importing these files into our component files, but this does not result in those styles being scoped to this component only
+- this means any class can be used anywhere else in the DOM
+- this is not necessarily a problem if we are careful with out selectors
+- however, in larger projects with a lot of developers working on the code - a name could potentially be used twice - leading to unintended styles being applied
+- this leads to the need for debugging, which you might want to avoid
+- there are two popular apporaches to avoiding this
+
+Approach 1: Styled Components:
+- there is a package called 'Styled Components' - the have an official website you can learn about them with
+- helps you build components with certain styled attatched to them
+- these styles really only affect the component to which the were attached to and not any other components
+- we install with this command:
+	npm install --save styled-components
+
+How to use it
+- lets say we want to style a button component (a wrapper component in our UI directory)
+- we would import styled from styled-components
+- we would then initialize Button in a const like we would in a regular component file, however
+- we would instead make it equal to styled.button``;
+	-> this is a weird syntax, it's called a tagged templated litereal - a default JS feature
+	-> 'styled' is an object that we get from the above import
+	-> 'button' is a method on this styled object
+	-> its a special kind of method, we don't call it with parenthesis
+	-> instead we add the backticks after it 
+	-> this will be executed as a method behind the scenes
+	-> what is passed within the backtick wil be passed into the method - just in a special way
+	-> the button method will return a new button component, what ever is passed is used as a style
+	-> this means that we copy and paste our whole original button CSS file into these backticks
+	
+	-> the button wont have a class of button, because we have no place where we would set up this className (no jsx to add className)
+	-> instead, the styles we passed will directly effect this button	
+	-> therefor, we get rid of any selectors (including the curly braces), and just paste in our styles 
+	-> this styles will be added to the button element which is returned by this method call
+	-> this element is then stored in the Button constant that we defined earlier
+	-> for pseudo selectors and nested selectors etc. - we can use the & symbol e.g. &:focus{}, & label{}
+
+	-> the button that is return also by default applies all the props you might be passing to your own button component
+	-> we export the Button constant in the end.
+	-> we can still set onClick prop and the type 
+	-> this will all be forwareded by the style components package, to that core built in button, which we previously wrapped and used ourselves
+	-> it is now used internally by this button method
+
+	-> we don't need to know the internals to proceed - but there is a lot more to learn if you want on this subject
+	-> this styled package has methods for all HTML elements (h1, h2, p, div, etc.)
+
+- we don't need the React import because we are not dealing with JSX in this file anymore
+- now if we inspect our button - everything in the UI looks the same but the inspected html has one difference
+- you will notice a crypticly named class(or two)
+- these are class names we didn't set up, they are dynamically generated by the styled ocmponents package
+- what this package does in the end:
+	-> looks at the styles we set up in the Relevant component file
+	-> wraps the styles we passed into generated class names
+	-> guarentees that every class name is unique so that it cant spill over to other components of the app
+	-> will then add these classes as global CSS
+	-> now that we have unique class names for every styled component, the style set up here will never be able to effect another component in the app
+
+
+Styled Components & Dynamic Props
+----------------------------------
+- styled components can be very useful, but can we also use them for other types of elements, like a div for example
+- yes we can
+- if we want a styled component which we really only use in a particular file, we can also create it in that file
+- we can also create a brand new file as we did for the button, but a button component might be something we use in a lot of other places - so it makes sense to do so in that case
+- it might make sense to create a new file if the component is only getting used in a particular file
+
+- a general good rule to keep is only having one component per file
+- however,  we can have multiple components per file 
+- if you have a component that is really only getting used by that other component in that file, having both components in the same file can make sense too
+- we replace the relevant div within the jsx with this component
+
+- however, we are no longer setting the error state for this button, we no longer are setting the invalid class
+- we need this invalid class for our rules though
+- the good thing is that the styled components, aka the components returned by the styled component functions, forward all props you set on them to the underlying components (the underlying div in this case)
+- so we can still add a className to the component in the JSX
+- we no longer need to set the original className that we were using when we were importing the CSS
+- instead, we just need to set up the logic for the error state in our JSX (can be done with short circuting eg {!isValid&& 'invalid'}
+- this is perfectly fine way of doing this, however there is another way
+
+- you can also utilize another feature provided by styled components	
+- you can also add props to your styled components and utilize those props inside of the backticks `` (where the styled component function is)
+- this allows you to use these props inside of your styles to easily change styles dynamically - useful in the case of our error state
+- we can then insert a dynamic expression using the template literal syntax
+- we would want to insert this in the location of the style value that we want to change
+- we then set up the conditional logic with the possible values 
+- this is done by passing a function that takes props as an argument, accesses the relevant property, checks the condition and sets a value based on the result
+	eg border: 1px solid ${props => (props.invalid ? 'red' : '#ccc') }
+
+So with that, we have a dynamic way of changing parts of the styles based on some props that are passed to our styled component
+-> not that in our styles within the backticks, it is extremely important to end your rules with semicolons.
+-> if you neglect to do so, your style will not be applied.
+
+
+Styled Components & Media Queries
+---------------------------------
+- media quiries often are important to get the right look
+- we might want a specific style of a component to change based on the dimensions of the device its being viewed on
+- for example, we might want a button to span the entire width of the view port if its on mobile, and only take the space needed on a desktop version
+- its actually very simple to do this with styled components
+
+- we just define media queries how you usually would in CSS e.g. @media (conditions){...}
+- we then define the styles the same exact way we did above, we don't need a selector - the styles will be applied to the component
+
+
+So the overall advantages of the Styled Component package:
+	-> really great for styling components (without using a css file)
+	-> ensures that styles really only affect components on which you set them up
+
+
+Using Css Modules
+-----------------
+- styled components are great, and they work perfectly fine
+- however, if you like having a seperate CSS file - and a clean component, it might not be the best choice
+- we could go back to using default CSS that uses global styles - but then our styles are not scoped to their components
+- that means we have to be extra careful with our style names - doable, perfectly fine but theres another way
+- we can actually still achieve these results while also achieving the benifit of scoping styles to their own components
+- we do this by using CSS modules, which is a whole different approach than the Styled Components in the previous section
+
+- projects need to be configured in order to support CSS modules because it needs a code transformation that needs to be done before your code runs in the browser
+- the good thing is that the react projects created with create react app are already configured to support CSS modules
+
+- since we are using our own component and not styled component functions to generate a component, we need to import react again (in our component file that we want to use CSS modules in)
+- we also need to import the relevant CSS file again, however, we need to change the file name to a special pattern in order for the code tranformations to happen
+- you need to add a .module to your CSS file
+- we also need to import it like we were importing an object
+	eg import chosenName from 'Button.module.css'
+- we can access this object in our jsx
+
+- this object has every style that you defined in your css file as a property that we can access using dot/square notation
+- in the dev tools, if you inspect an element with a class transformed by css modules, you will see that it's class name is cryptic
+- simillar to styled components, however, they have different patterns (which are not important, just important to know that they are different) 
+
+- what css modules build process does under the hood is it takes the CSS classes in the CSS file and changes those class names to be unique
+- for every component, it changes the class names of the classes you are importing to be unique
+- that means that every class in the CSS file will have its own unique name when it is rendered to the UI 
+- your class styles are all kept the same, they are just wrapped in a new class name
+
+- with that, this CSS modules concept ensures that the CSS styles that we set up in the css file are scoped to the component we import this file into
+- for that we need to work with CSS classes in our CSS file, which we then access in our component by accessing the properties of the object we use for storing the import
+- this is how we make the connection between the dynamically generated class names and our components
+- we can use these classes in our JSX by accessing the object we imported them to as properties, and using dot/bracket notation to access the properties on that object
+- this is all done within a dynamic expression (if inside the JSX)
+
+Note that class names with a hyphen between words, eg, form-control, cannot be accessed with dot notation (default JS behavior for objects)
+- instead, we have to access these classes by using bracket notation and quotes (strings are valid keys in JS objects)
+	e.g styles['control-form']
+
+Dynamic Styles with CSS Modules
+-------------------------------
+- currently, if we had a dynamic state based of a value of state (like an error state), it wouldn't work yet - we have to add the logic
+- we can do this by using template literals within our dynamic expression `` $()
+- we would just the div with a className prop equal to a dynamic expression
+	-> within this dynamic expression, we would have back ticks to start our template literal
+	-> we would then use the template dynamic syntax $() to set our initial class styles on the element
+	-> followed by a space (to seperate the classes)
+	-> followed by another template dynamic expression $() containing our conditional logic
+	-> the conditional logic could use short circuting
+		e.g <div className={`$(styles['form-control']) $(!isValid && ${styles.invalid})`>}
+
+- this would allow us to add dynamic classes with CSS modules
+- its not really different from normal classes, because they essentially are normal classes
+- we just extract the converted class names as they were generated by CSS modules
+- then we combine them as needed
+
+Media Queries
+-------------
+- you write your media queries in your css file as usual
+- remember to include the selector, styled components does not use selectors because it processes your css for you
+- css modules is still normal css, just after converting classes to unique names and storing them in an object
+- this means you must still write class names in CSS 
+
+Note that the approach to styling your components is based on preference - you can choose what ever way you'd like
+- max likes CSS modules the most, I do as well - although styled components were pretty interesting 
+- default CSS is also not so bad if you are careful with class names, however, on a team of devs - it might become a problem to coordinate
+- using one of these scoped styling approaches gets rid of that possibility because every style will be unique to the component it is imported to
+- styled components down side is having the CSS in the component itself, which makes it look less organized as well as doesn't seem like its following the 'seperation of concerns' practice
+
+- this is why CSS modules is my favorite
+- it allows you to scope your styles to a component
+- it allows you to do this in a more organized way (in my opinion) than the alternative taught in this course
+- since it's essentially just css with an extra processing step, you can write your CSS exactly how you usually would

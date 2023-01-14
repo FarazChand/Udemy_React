@@ -1,0 +1,10 @@
+Intro
+-----
+- we learned about Reacts most important features, its core pillars, and also how you stye React apps
+- however, as a dev - you will run into erros eventually - so you should know how to deal with them when using React
+- in this module you will learn how to debug react apps, how to find and fix erros
+
+- in this module:
+	-> Understanding Error Messages
+	-> Debugging & Analyzing React Apps
+	-> Using the React DevTool

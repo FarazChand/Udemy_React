@@ -1,0 +1,117 @@
+Initial Setup
+-------------
+
+
+	
+
+
+-----------------------------------------------------
+
+App.js
+=======
+
+Imports:
+-> React + useState from react
+-> CourseGoalList component
+-> CourseInput component
+-> App.css
+
+
+App Data:
+---------
+
+courseGoals State:
+-> it sets the state to an array of objects that represents the list of course goals
+-> is initialized with 'Dummy Data'
+-> each object represents a goal on the list
+-> each goal has the properties:
+	-> text: the text that is displayed
+	-> id: the unique id of each goal
+-> courseGoals is the variable used to access the state
+-> setCourseGoals is the state updating function
+
+'content' variable:
+-> it's intended to hold a JSX element that will be rendered to the page
+-> the default value is a paragraph element which is intended to be rendered if there is courseGoals data
+-> there is also some logic associated with this variable - in the form of an if statement
+	-> it checks if the courseGoals list has a length greater than 0 (if there is data)
+	-> if it passes the condition, it sets content to a new value
+	-> the new value is our CourseGoalList component, with two props passed
+		-> the first prop is named 'items', and its value is set to 'courseGoals' variable
+		-> the second prop is named 'onDeleteItem', and its value is set a pointer to the 'deleteItemHandler' function
+
+App Functions:
+--------------
+
+addGoalHandler:
+-> takes a string as an argument (enteredText)
+-> it calls the state updating function for courseGoals, using the special function syntax to access the prevState
+-> spreads the prevState into a new array, unshifts a new object into this array
+-> the new object's text property is set to the enteredText argument
+-> the new object's id property is produced with Math.random() and converted to a string using toString()
+-> this array is then returned 
+
+deleteItemHandler:
+-> takes an id as an argument (goalId)
+-> calls the state updating function for courseGoals, using the special function syntax to access the prevState(prevGoals)
+-> uses the filter method on prevGoals in order to loop through courseGoals and return a new array with goals that pass the condition
+-> the condition each goal has to pass is that it cannot contain an id property that === the goalID argument
+-> once the filter method finishes and returns the new array, it is stored in a variable(updatedGoals)
+-> updatedGoals is returned
+
+
+
+
+
+App Return:
+-----------
+- returns a single div, with no className
+- this div contains two section elements
+	-> this first one has the id prop of 'goal-form'
+	-> the second one has the id prop of 'goals'
+
+goal-form:
+-> contains the CourseInput component
+-> passes a prop called 'onAddGoal' which is assigned the value of the 'addGoalHandler' function
+
+goals:
+-> contains only a dynamic expression as its content
+-> the dynamic expression contains the variable 'content' 
+-> this 'content' variable's value is determined before the return statement
+
+
+ 
+CourseInput.js
+==============
+-> React + useState from react
+-> Button utility component
+-> CourseInput.css
+
+
+App Data:
+
+
+props Object:
+-> receives one props from App.js
+	-> addGoalHandler
+
+enteredValue State:
+-> sets the state of a variable intended to represent an entered Value
+-> it is initially set to an empty string
+-> enteredValue is the variable used to access the state
+-> setEnteredValue is the state updating function
+
+App Functions:
+--------------
+
+goalInputChangeHandler:
+-> accepts an event as an argument
+-> calls the state updating function for enteredValue
+-> sets the new state for enteredValue to the argument target's value
+
+formSubmitHandler:
+-> accepts an event as an argument
+-> prevents the default reloading of the page when a form is submitted
+-> calls the 'addGoalHandler' method from the prop Object and passes the 'enteredValue' variable as an argument
+
+
