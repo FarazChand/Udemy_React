@@ -1,0 +1,9 @@
+.users {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  background-color: white;
+  padding: 2em;
+  list-style: none;
+}

@@ -1,0 +1,74 @@
+Project Overview:
+- we are going to create a relatively simple app that covers the majority of the important React fundamentals we have learned so far during the course
+- in this application you can:
+	-> add fictional users
+		-> takes a name as an input
+		-> takes an age as an input
+		-> also has validation for input fields
+			-> when validation fails, a waring modal pops up
+				-> fails if no input is entered for an input element and sumbit is attempted
+				-> fails if a negative number is submitted as the age value
+				-> this modal can be dismissed by clicking on the 'ok' button or clicking on the backdrop
+		-> when a valid user is submitted succesfully, these input fields are reset - user is added to the list
+	-> displays added users in a list
+
+- as far as components, the application seems to have two components:
+	-> the input form
+		-> the input form consists of the two input fields and a button to submit
+	->  the rendered list of users
+		-> contains each successfully added user item
+
+		
+	
+
+Project Initialization:
+-----------------------
+- The first thing I did was create a directory for where I wanted to start the project
+- I then created the react application directory by using the create react app command in the terminal
+	e.g. npx create-react-app my-app   
+	-> note that it is npx, not npm
+	-> the app's name has certain restrictions to keep in mind, like no capitals (not sure about others)
+
+- next, I moved into my app directory with 'cd app-name', and ran npm start to ensure it was created properly
+- I made sure there was a .gitignore file present in the app directory
+- wanted to clean up the files, so I looked at an old project from the course to see what files are 100% necessary
+	-> kept the public files pretty much unchanged
+	-> deleted everything in the src directory to start from scratch
+
+- in the src folder, I create the index.js and app.js files
+
+Index.js Creation
+-----------------
+- in index.js I imported React from react and ReactDOM from 'react-dom/client' 
+- I also imported App.js to use the App component later on
+- I created the root object by using the createRoot method from the ReactDOM object - selected the root element in my html
+- we then used this root object's render method to render the App component
+
+App.js Creation
+---------------
+- imported React from 'react', not sure if necessary at this point and beyond but will include
+- created the App component
+- returned some test JSX, just one div with two components inside that say something
+- exported App as default (important)
+- checked to see if the browser showed the component rendered
+
+
+Created a components directory in our src directory.
+
+
+in App.js:
+- created an array to store dummy data to use as a list to set the initial state of our user data
+- note that the state will be an array of objects, each object representing a user's data including their name, age and a unique id for that object
+
+
+
+
+The way I see it, there is three main parts to a project:
+- the structure aka the html, the way the elements are put together
+- the logic aka the JS, how things work when events happen
+- the styling, the CSS, how things look - the last touch
+
+I beleive they should probably happen in the order above as well - possibly with some exceptions
+
+
+

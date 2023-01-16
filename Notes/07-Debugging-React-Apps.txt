@@ -8,3 +8,59 @@ Intro
 	-> Understanding Error Messages
 	-> Debugging & Analyzing React Apps
 	-> Using the React DevTool
+
+
+Understanding React Error Messages
+----------------------------------
+- if you run npm start for a project that contains some errors
+	-> you will immediately get an error in your terminal
+	-> if you visit the application in the browser, you will also basically get the same error output there (instead of the working application)
+	-> this is a common thing, sometimes when you are writing code - you get errors.
+	-> these are errors that the React development process catches and throws at you
+
+- some errors can be detected in your IDE, some will not show up - you should know how to debug in both cases
+- your terminal will show you why your code isnt working
+	-> it will show the file where the error occurs
+	-> it will show you the line and character that the error occurs
+	-> it will extract a snippet of the code that isnt working
+	-> it will even give you a suggestion on how to fix it, and why it isnt working
+- this information is also available in the browser once you attempt to run your app
+
+
+Analyzing Code Flow & Warnings
+-------------------------------
+- some errors don't show up in the terminal or the browser, but you can tell they are happening because your app is not acting the way you expect
+- for example, when you try to delete an item in a list, but it deletes the wrong item
+- this is usually because of a logical error 
+	-> an error that doesn't cause the code to compile incorrectly, but causes it to act in a way that wasn't intended
+	-> can usually be found by understanding what is happening, what part of the code deals with what is happening..
+	-> checking the logic and following the flow of the code to check where this logic may be wrong
+	-> in other words, we go through the chain of the events in our code relevant to the logical error
+
+This is a perfectly great way to debug our code, we could also use the help of the browser console
+-> if we inspect our code the browser console will sometimes display a warning that can potentially help us figure out what is going wrong 
+-> it can give us any console.log messages we added in our code
+-> it also gives us some warnings and errors that are thrown by the library which don't crash the whole application necessarily
+
+
+Working with Breakpoints
+------------------------
+- we can also use breakpoints to help us debug
+- to do this:
+	-> go to the sources tab in the browser developer tools
+	-> in there you can find the source files that are being used in the webpage - including your JS code
+	-> the code we write is not the code we execute in the browser, the dev process transforms what we write into code that can run
+	-> the react development process gives the browser a bridge between the code that runs in the browser and the code we wrote
+	-> this means that we can access our written code in the browser
+	-> we do this by going to the 'Users' folder in the source tab
+	-> if you don't find it there, it might be located somewhere else - but it is located somewhere in the sources tab
+	-> you can then go into the file you want to inspect - go to the line you want to add the breakpoint to and add it by clicking on the line number
+	-> this breakpoint will cause the code execution to stop where you specified
+	-> so if we do the action that causes the error, the code will stop executing at the breakpoint, then you can walk through your code step by step
+	-> you will also have surrounding information on the boxes at the bottom - including variables that are available and the call stack
+	-> we can step through the code by clicking on the step to next function button 
+	-> we can even hover over variables to see what is currently stored in them
+
+I personally don't like this way of debugging because it's kind of confusing and messy, but I think that's because
+I just don't have enough experience debuggin this way - I understand that it is a very powerful tool with a lot of information 
+and can be very helpful if you know how to use it correctly.

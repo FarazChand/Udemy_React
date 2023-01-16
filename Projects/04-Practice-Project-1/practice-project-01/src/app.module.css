@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.app {
+  background-color: black;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* gap: 2em; */
+  /* padding-top: 2em; */
+}

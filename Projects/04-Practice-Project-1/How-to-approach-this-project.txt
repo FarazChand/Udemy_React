@@ -1,0 +1,208 @@
+All of the details on what the project is and what it's supposed to do are in Section 8 lecture 88.
+Note that this project is an excellent recap of the majority of what we have learned up to this point.
+
+
+Initial Setup:
+--------------
+
+The first thing max does is creates a new React app, he actually just allows us to download a zip and use it as the project starting directory.
+-> includes the json package for the dependencies
+-> includes an empty src folder, excepts for an index.js, app.js file and an index.css file
+-> the public directory looks unchanged
+-> there is not .gitignore so that needs to be added
+
+- If we used create-react-app, we would just have to delete the files in the src folder to match above
+- we should also probably add a .gitignore before we do anything else
+- once that is done, we can run npm install and npm start to open the dev server and the app in the browser
+
+The inlcuded index.js and App.js file are pretty much the default from create-react-app files
+index.css had some basic reset styles set (box-sizing, font-family, margin on *, html and body)
+Dictionary:
+o/c = opening/closing
+set to = given the assigned value of
+
+
+After the initial setup, max tells us to plan for the project.
+-> we know that the project includes a place where we add users using a form that we submit
+-> we know that there will be some UI elements
+-> I also inferred that there will be a place where we render the user list
+
+
+Knowing this, we can plan our directories:
+-> in our src directories, the top level will contain our index.js +css, our App.js, and we will now add the components directory to this
+-> in our components directory, we will add a Users directory to store our form component (and I guess the rendered list component too)
+-> we will also add a UI directory to store our Cards/Container components
+
+-> with this done, we have set up a blueprint of what our component tree is going to look like, now we fill it in with the actual components
+
+
+
+Adding a 'User' Component
+-------------------------
+
+Max starts with the form itself, which makes sense:
+-> we should start with the input itself because it is where we are going to get all of our necessary user data from
+-> by doing this, we can account for all of the data that will be collected and passed - in the end, the App component uses this data to create new users
+ (when I first did this project independently, I started with the UserList - though it worked, it might be easier to think about data flow when we start it max's way (have to test))
+
+-> its also important to note that Max works on the returned JSX (in the end, the html structure that renders) before worrying about the style
+-> this means he focuses on the structure of the component he is working on before worrying about styling or logic (I assumed this order too, structure > logic > styling)
+-> this gives us something to work with
+
+
+To start working on the form, he creates a file called AddUsers.js in the Users directory:
+-> the purpose of this component is to collect data through user input and form submission, then pass this data up
+-> the first thing he does to work on this component (after initial set up):
+	-> he creates the form element itself
+	-> within the form, he then creates a label and input pair for the first and second input fields (for username and age inputs) 
+		-> note that the input has an id attribute that is assigned the relevant value (e.g. username, age) - allows us to identify the element
+		-> it also has the type attribute set to the relevant input (e.g. text, number)
+		-> note that the label has an htmlFor attribute that is assigned the id of the relevant input as a value - this connects the label and input semantically
+		 (these are things I did not do in my attempt, I excluded the htmlFor and id attributes...)
+	
+	-> also within the form, he then creates a button element with the type attribute set to submit, and the relevant text between the o/c tags('add user' in this case)
+	-> we then but an onSubmit listener on our form element and assign it a pointer to addUserHandler (which is the name of the function we will define in order to handle the form submission)
+	-> next we define the addUserHandler function above our return
+		-> it takes an event as an argument
+		-> it prevents the default behaviour of form submissions
+
+	-> with this set up, if the button is pressed - it will run the addUserHandler function - which we will define further later
+	-> now in order for us to finally see something on our page, we will have to import this component to our App.js file
+
+
+Max then imports AddUser to the App.js file:
+-> we return a div that we are going to be using as the main element that the App component returns
+-> within this div, we insert our AddUser custom element
+-> now when we render our application, we should be able to see our form which we created in the AddUser component
+
+
+Adding a re-usable 'Card' Component
+------------------------------------
+
+Once this first form components foundational code has been created and imported, and we can see it on the webpage, he continues to now create the UI components which he knows will appear on the component
+-> we first build the Card component
+-> we know that we want our form to be in a Card wrapper/container, so we create Card.js in the UI directory
+-> we also create the Card.module.css file in the same directory, because we plan on styling this component using CSS components
+-> we import this css file and store its transformed classes in an object we call 'classes' (done while importing as css module)
+
+-> this card component is intended to wrap around content, acting as a container with a specific styling 
+-> this means we want to return a div, which is what is going to wrap the content
+-> we then put {props.children} between the divs o/c tags
+-> this is done so that when this component is used to wrap content in another file, it will be able to render the content it is wrapping
+-> now we want to apply the components default style by using the css module object 'classes'
+-> we do this by giving the div a className property set to classes.card, within a dynamic expression (card being the relevant class in our css file)
+-> we then define this class in our css module file and give it our desired styles:
+	-> for styling the card, max styled the background, the box shadow and the border radius
+
+-> since we want to use our Card component in our AddUser component, we import it in AddUser.js
+-> after we've imported our Card component, we can insert it as the main element of our return, and wrap all of our content (the form and all of its children) within it
+
+Max then starts to style the AddUser.js file by using css modules again:
+-> to do this we create and import the AddUser.module.css file, creating a 'classes' object to store the transformed classes in our css file
+-> he has a predefined file which we just copied and pasted
+-> note that if we were doing this for a real project - we would probably not have access to this before hand
+-> so instead, we would want to give a pass a className property to an element (probably the outer most), and set it to the relevant class on the classes object(css module object)
+-> we would then go into our css file and define the class and it's rules to produce our intended style
+-> we start by passing a className property to our imported Card component, have it set to the relevant class
+-> note that this className property is being passed to a custom element we created, in this class 'Card', and therefore has no default instruction on what to do with it
+-> so we have to tell it what to do with it in our Card component file 
+	-> we simply make our className property on our div within our Card component file set to a dynamic expression that contains a template literal ``
+	-> we then add a template dynamic expression ${} to include are default class, and another ${} to include the passed className from AddUser (props.className)
+	-> if a className is passed from AddUser, it will be added to the className list, if not, it will be empty and therefor only render the default className
+
+
+Adding a re-usable 'Button' Component
+--------------------------------------
+
+Max then does the same UI component process with the Button component:
+-> everything is the same as the Card component process, but with some additional steps
+-> one and only initial difference is that we return a button element instead of a div (the button is the wrapper this time)
+-> we also want to be able to change the type of the button based on what is passed as a type prop
+	-> we do this by passing type as a prop to our button element, and have it set to a dynamic expression
+	-> within this dynamic expression, we want it to be set to props.type (the passed type), OR simply 'button' if nothing is passed
+-> we also want to set an onClick listener to our button and have it set to props.onClick (the passed function - which I think actually comes from passing as a prop to the form element in AddUser.js, not sure)
+-> remember exports and imports etc..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- So the first thing we focused on was gathering data
+- we then focused on displaying that data
+
+Gathering data:
+- we first focused on the form structure
+	-> the form itself, its inputs and their labels and establishing a connection through id - as well as defining their type
+	-> the button, adding the basic logic that connects the button and the form, adding submit listener to the form, set to a handler
+	-> defining the handler and giving it basic logic that prevents default form submit behavior
+	-> making the correct inputs so it renders and we have feed back on the webpage - testing the button 
+	
+- we then focused on the relevant UI components as well as the styling for the comonent itself
+	-> start working on the re-usable UI components that are being used within the form components and used CSS modules to style them
+	-> made sure these UI comonents can accept the relevant props in order to make them configurable by passing props
+	-> added these components to our main form component in the correct places
+	-> importing the css module for our form component and adding the relevant classes to the relevant elements
+
+- next we focused on the remaining logic, starting with managing user input state
+	-> added two state variables to collect data for our two input fields, set to empty strings as their default state value
+	-> added on change event listeners to both our input fields to listen for keystrokes, set to their own event handlers
+	-> defined their event handlers designed them to use the relevant state updating function to set the state to the current input
+	-> also set the value property of the relevant input element to the relevant state variable
+	-> can we console log the correct values in our addUserHandler? (testing form submit handler)
+
+- after that, we add our validation and resetting logic
+	-> use the state updating functions of our input elements inside of our form submit handler (addUserHandler), setting the states to empty strings after the console log
+	-> check if the input elements had valid data upon the submit event being triggered
+		-> valid if both fields have some input (not empty)
+		-> valid if the age field is not 0 or below (> 1)
+		-> note that for checking for empty input fields, we check each input elements state, use the trim() function to remove whitespace, then check that their length is > 0 (means there is input)
+		-> note that for checking for a valid age, we convert the age state from a string to a number by using type coercion (+stateVariable) and comparing it to our conditional number (< 1)
+		-> not that these are separate if statements, which simply return (exit function, not executing consol logs or reset) if the condition is met - meaning input is valid
+	-> check if our validation and reset works with the right data? Wrong data? Check to see for each obvious scenario.
+	
+
+With that we are done with our component that gathers data.. for now..
+
+Displaying data:
+- we want to make a component that displays the List of Users
+-> we know that it's going to be an array of objects with properties which we want to use and display
+-> we also know that we will receive this array as a prop from a parent component
+-> keeping this in mind, we create a new component file called UsersList.js, which imports its css module as well as the re-usable Card component
+-> we return an unordered list that we intend to contain each individual user as its own list item
+	-> we do this dynamically using a dynamic expression which accesses the array of users which we received as a prop
+	-> it then maps through each item in the array, and uses that items property to fill in the content of each list item
+	-> not that this map method takes a functions that MUST return something, in this case it will return the configured list item
+	-> we also wrap this item in the Card wrapper component, and apply the css module class to the relevant elements
+-> don't forget to export
+
+- once the UsersList component is complete, we can import it to its parent component App.js
+-> we do this because we need to render it for one, we also need to get data from our AddUser component
+-> we also want to keep our components focused on a certain task - which is why we don't import UsersList into our AddUsers component - they have completely different tasks
+-> we use our parent component to import both of them and render them in its JSX because we can pass data from child to parent, an parent to child
+-> this connects the two focused components through their parent component - allowing us to pass data from one to the other
+
+- after importing UsersList to App.js, we need to then pass a prop that represents our array of users
+-> we make sure we name the prop the same name that we use to access the array in our UsersList, they have to be the same in order for the data to flow
+-> we set it to a dynamic expression that contains an empty array for now
+-> with this, we can see an empty card component rendered below our form, which means it works
+-> now we have to generate an actual Users array and pass that instead of this empty array, meaning we have to get data from the form, pass it up to the parent, and then back down to the UsersList
+
+
+
+
+

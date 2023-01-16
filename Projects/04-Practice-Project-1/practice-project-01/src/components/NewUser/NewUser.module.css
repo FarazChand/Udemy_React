@@ -1,0 +1,26 @@
+.new-user-form {
+  padding: 2em;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.button {
+  display: inline-block;
+  align-self: start;
+  border: none;
+  background-color: rgb(98, 16, 175);
+  padding: 0.5em 1.5em;
+  color: white;
+}
