@@ -1,0 +1,54 @@
+Intro
+-----
+- Effects, Reducers and Context 
+- a little bit more advanced, yet super important
+- must know previous concepts before tackling this  
+
+We will cover:
+- Working with (side) effects
+- Managing more Complex State with Reducers
+- Managing App-Wide or Component-Wide State with Context
+
+
+What is an 'Effect' (or a 'Side Effect')?
+-----------------------------------------
+- Reacts Main Job: Render UI & React to Us er Input, Re-render when needed
+	-> Evaluate & Render JSX
+	-> Manage State & Props
+	-> React to (User) Events & Input
+	-> Re-evaluate Component upon State & Prop Changes
+
+- This all is 'baked int' React Via the 'tools' and features covered in this course (i.e. useState() Hook, Props etc)
+
+Side Effects: Anything else that might be happening
+	-> Store Data in Browser Storage
+	-> Send Http Requests to Backend Servers
+	-> Set & Manange Timers 
+	-> etc.  
+
+- These tasks must happen outside of the normal component evaluation and render cycle
+- especially since they might block/delay rendering (e.g. Http requests)
+
+- side effects should not go into main components
+	-> this is because it can create bugs
+	-> you might not want to make an http request everytime you rerender a component
+	-> you could also cause an infinite loop if that http request changes a state variable
+
+Handling Side Effects with the useEffect() Hook
+-> another built in hook
+-> takes two arguments:
+	-> the first one is a function that should be executed AFTER every component evaluation IF the specified dependencies changed
+	-> your side effect code goes into this function
+
+	-> the second one is the dependencies of this effect - the function only runs if the dependencies changed
+	-> specify your dependencies of your function here 
+
+
+Using the Effect() Hook
+----------------------- 
+- for example, in a website where we log in, we want the user to be logged in even after page reloads
+- we can accomplish this by creating a variable in local storage that stores a value that indicates whether the user is logged in or not
+	-> the names of the variable and value are what ever we want them to be
+	-> we access the localStorage object and use the setItem method, giving it two arguments - the variable and the value - in that order
+		e.g. localStorage.setItem('isLoggedIn', '1') // values must be strings	
+	-> we can inspect our webpage, go to the application tab - under local storage - we can see our data persisting

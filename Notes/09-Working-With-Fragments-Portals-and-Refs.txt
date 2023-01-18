@@ -1,0 +1,140 @@
+Intro
+-----
+- JSX Limitations & Fragments
+- Getting a Cleaner DOM with Portals
+- Working with Refs
+
+
+JSX Limitations & Workarounds
+------------------------------
+- JSX has certain limitations
+- specifically, one limitation which we have already faced in this course is adjacent root level elements causing errors
+- this will not work, in React(JSX), we can't have more that one root JSX element
+- this goes for returning, storing in a variable, const or property - value can only be one JSX element
+- note that this one root element can have multiple children which can be adjacent to eachothe, the limitation only applies to the root element
+- this makes sense because we can't return more that one value in JS (arrays and objects count as one value with properties/values within)
+
+- your JSX code translates into the React.createElement() method - which returns a value..
+- if our component is returning the value returned by this method, we can see why we should only be able to return one JSX element 
+ 
+
+How do we work around this?
+- we can wrap the adjacent elements in a div, effectively making the div the root element
+- you can think of this like returning 3 numbers by returning them in an array
+- note that this doesn't have to be a div, it can be any element - even a custom component - as long as there is only one root element (meaning one value is returned/stored)
+
+- note that instead of divs we could just replace our div tags with an array [], putting our JSX within the array
+- howvever, this requires us to give our elements a key property and remove any {} around adjacent root elements that are evaluated through an expression (since they are just JS now)
+- this is extra work so it is much easier to wrap with divs
+
+- though wrapping with divs does work fine, it creates another problem: '<div> Soup'
+- we end up with a real DOM that's being rendered where you have many nested React Components...
+- and all these components for various reasons need wrapping divs or wrapping components
+- this leaves us with all these unnecessary divs being rendered in the real DOM even though they're only there because of this JSX limitation
+- in bigger apps, you can end up with a lot of unnecessary divs (or other elements) which add no semantic meaning or structure to the page
+- they are only there because of React's/JSX; requirement
+
+- having nested divs can break stylings, if they appear where you don't expect them
+- even if it doesn't - it's still not a good practise - makes code hard to read for one
+- rendering too many HTML elements makes your application slower, because the browser must render these elements and react must check (at least some of) these elements if content needs to change
+- rendering unnecessary content in generally never a good idea in programming
+- hence, this wrapping element approach is OK. but not ideal
+
+
+Creating a Wrapper Component
+----------------------------
+- we can create a component that simply returns props.children, then import it and wrap our adacent root elements within it
+- this has the same result as wrapping them in a div, however, without the consequence of div soup
+- since we are essentially returning one value, we can do this
+
+
+React Fragments
+---------------
+- We actually don't even need to create this wrapper component, React has a feature that does this for you called Fragments
+- we just add an element called React.Fragment (or import Fragment as a named import, and just use Fragment)
+- you can also use <> empty tags if your project set up suports it
+- allows us to write cleaner code and have less unnessesary html elements on the final page
+
+
+Introducing React Portals
+-------------------------
+- another useful feature which do something similar
+- we might have our components rendered in a specific location because it makes sense to do so logically when reading our code (less friction to pass data around)
+- however, in terms of the DOM structure - it might not make sense 
+- for example a modal that is rendered in a form component because the state is managed there - but should be a direct child of the body element in the DOM
+
+- semantically and from a 'clean HTML structure; perspective, having this nested modal isn't ideal
+- it is an overlay to the enitre page after all
+- can lead to real problems with styling and accessablitity (screen readers)	
+
+- we can use the Portal concept to get rid of this problem
+- it allows us to write our components in what ever way we see as logical in order to cause less friction when passing data...
+- while also allowing us to render it differently in the real DOM (semantically correct)
+
+
+Working with Portals
+--------------------
+- Portals need two things:
+	-> a place you want to port the component to 
+	-> you then want to let the component know that it should have a portal to that place
+
+- to mark that place, we go into the public folder, then to the index.html(the html which is being rendered in the end)
+- in here, its common that you add a div with an id which you will then use to identify this place later
+- the naming convention seems to be id='elementName-root', seem to be calling these divs 'roots'
+- you can create multiple roots for different kinds of components that should be portaled
+
+- now we have to tell React that we want our component to be portaled somewhere
+- the component that we want to portal will remain the same, exporting its JSX - nothing changes here
+- in the location that it is rendered (the parent component that we use it in), we change how it is written into the JSX
+	-> we first need to makes sure that we import ReactDOM from react-dom library in order to get access to a special method on the ReactDOM object(react-doms default export)
+	-> this method is called .createPortal() which takes two arguments:
+		-> the first argument is the child component we want to portal that we imported earlier (expected in JSX form, any props that need to be passed should be passed with the correct names)
+		-> the second argument is the place in the HTML we want it to render (where in the real DOM)
+			-> this is done by using document.selectElementById() and passing a string that contains the ID of div we want to portal this component to
+			-> remember that we marked a div earlier with an ID for this specific reason
+
+This allows us to keep our component tree structure the way we see fit, while also allowing us to render these components to the Real DOM in a semantically proper way
+The idea really just is that the rendered HTML content is moved somewhere else.
+
+
+Working with 'refs'
+--------------------
+- in their most basic form, refs allow us to get access to other DOM elements and work with them
+- with refs, we can set up a connection between an HTML element (which is being rendered in the end) and our other JS code
+- for that, we first need to create a ref - which we do with the help of another React hook
+- we use the named import useRef from the react library, which is a hook
+- we call useRef() in our component definition (above the return and not nested, just like useState)
+	-> it takes a default value that you want to initialize it to (not required)
+	-> returns a value that allows us to work with that ref later (the element to which we're going to connect it)
+	-> we store this value in a const so that we can use it later
+	
+- we can let React know that we wanna connect a ref to an HMTL element by going to that element and adding a special prop there
+- the 'ref' prop, just like the 'key' prop, is a built in prop which you can add to any HTML element
+- note that you can connect any HTML element to one of your references
+- this is done very often for inputs - because you want to fetch input data, for example
+
+- we want to pass the name of the const we stored our useRef() method's return in - which connects our ref with our rendered jsx 
+
+- the first time React reaches the components JSX, and renders it - it will actually set the value stored in the const we created for useRef, to the native DOM element that is rendered base on the element we set the relevant ref pro too
+- so a real DOM element is stored as the value for the const we created for useRef earlier, the DOM element being the one rendered by the JSX element that we connected with our useRef via props 
+
+- the ref value always is an object 
+- this object always has a 'current' property
+- the 'current' property has the actual value that that ref is connected with
+- as soon as our JSX renders, and React sees that a certain jsx element has the 'ref' prop set to the const used for the useRef we used earlier..
+- it takes the actual DOM node that the jsx would render, and returns it to that const 
+- it stores it in the const object's 'current' property
+
+- we don't want to manipulate this node, we just want to read data from it
+- we can access the data of an element through refs
+- for example, if we connect a ref to an input element - that input element is stored in the 'current' property of the const's obect..
+- we know that input elements have a 'value' property
+- that being said, we can access this property like so: 
+	e.g. exampleConst.current.value   -> gives us the value of the node 
+
+
+- we can store this value in a const and use it in the place that we would have used state for, e.g. validation, lifting data to parent
+- we can reset the input by directly manipulating the dom node (which we should do very rarely - try not to do this at all, but this is an acceptable edge case)
+- we can also get rid of the value and onChange props of our input elements because we are no longer relying on two way binding or key logging to obtain the user input
+
+if you just want to read a value, refs are probably better
