@@ -52,3 +52,339 @@ Using the Effect() Hook
 	-> we access the localStorage object and use the setItem method, giving it two arguments - the variable and the value - in that order
 		e.g. localStorage.setItem('isLoggedIn', '1') // values must be strings	
 	-> we can inspect our webpage, go to the application tab - under local storage - we can see our data persisting
+
+- if we try to check if the user is logged in by simply checking this variables value, and changing the state on our component based on the value
+	-> it would cause an infinite loop
+	-> this is because our state is being changed, which causes a page re-render, causing the state to go back to default and our component to run again and check the state again etc etc
+	-> this is where we use useEffect()
+
+
+
+
+What to add & Not to add as Dependencies
+----------------------------------------
+- you should add 'everything' you use in the effect function as a dependency
+- i.e. all state variables and functions you use in there
+- there are a few exceptions to be aware of:
+	-> you DON't need to add State updating functions
+		-> react guarantees that these functions never change, hence you don't need to add them as dependencies
+	
+	-> you DON'T need to add 'built-in' APIs or functions
+		-> such as fetch(), localStorage, etc
+		-> functions and features built-into the browser and hence available globally
+		-> these browser APIs/ global functions are not related to the React component render cylce and they also never change
+	
+	-> you DON'T need to add variables or functions you might've defined OUTSIDE of your components
+		-> e.g. if you create a new helper function in a separate file
+		-> such functions or variable also are not created inside of a component function
+		-> hence changing them won't affect your components (components won't be re-evaluated if such variables or functions change and vice-verse)
+
+TLDR:
+- you must add all 'things' you use in your effect function if those 'things' could change because your component (or some parent component) re-rendered
+- that's why variables or state defined in component functions, props or functions defined in component functions have to be added as dependencies
+	
+	
+
+useEffect Clean Up Function
+----------------------------  
+- you might not want the useEffect function to execute everytime a certain dependency changes - for example, sending an http request everytime you type a character in order to check if a name exists in a database
+- this could be overkill, even updating state on every keystroke could be undesired
+- we might instead want to execute the function after a certain time has passed since the last keystroke, like .5 - 1 sec
+	-> this means that we are executing the function a lot less which I assume would increase performance
+	-> we are essentially calling the effect function a lot less, only after a certain condition
+	-> this is a technique called debouncing
+- we can set this condition with the 'clean up' function
+	-> involves using the setTimeout function to add a delay to when we execute the effect function (everything mentioned here is defined in the body of useEffect hook)
+	-> we can save the value of the setTimeout and then clear the timeout if another keystroke occurs before the timer expires
+	-> allows us to only have one timer at a time, when the user stops timing - the last timer will expire and the effect function will run
+
+-useEffect hook makes this easy to implement
+	-> the useEffect hook can actually have a return value
+	-> this return value must be a function (could be anonymous or named)}
+	-> this function is known as the 'clean up; function
+	-> this function will run as a cleanup process before useEffect executes its effect function the next time
+
+- to be clear:
+	-> when ever the effect function runs, before it runs - the clean up function is executed
+	-> note that the clean up function does not run on the first execution of the effect function(on first render)
+	-> knowing this, we can save our setTimeout to a variable
+	-> we can then use clearTimeout in our cleanup function and pass this variable as an argument
+	-> this allows us to clear the last timer before we set a new one 
+
+
+useEffect Summary
+-----------------
+- the most important hook besides useState
+
+Takes two arguments:
+- the first one is the useEffect function - a function that we pass that we want to execute as a result of some actino
+- the second argument is the dependencies - an array of variables/state that we watch for change, executing the function from the first argument if that change occurs
+
+The useEffect function:
+- runs when the component first mounts (when the component is rendered for the first time)
+- runs AFTER every component render cycle 
+- if we have an empty array of dependences - it only runs for the first render, but not for any after (because technically dependencies don't change)
+- if we add a dependency - it also runs after every component render cycle but onlu if the dependency also changes
+- when we don't have a dependencies argument at all, the useEffect function runs every render cycle
+
+The clean up function:
+- we can return a function from the useEffect function, this function is the clean up function
+- this 'clean up' function runs before the useEffect function executes, however, not before the first time it runs
+- when there is no dependencies (empty array), the cleanup function runs when the component is removed (unmounted)
+
+
+
+Introducing useReducer() for StateManagement
+---------------------------------------------
+- another built in hook that will help us with state management
+- simillar to useState but with more capabilities and especially useful for more complex state
+
+- sometimes, you have more complex state 
+- for example, if it got multiple states, multiple ways of changing it or dependencies to other state
+- useState() then often becomes hard or error-prone to use
+- it's easy to write bad, inefficient or buggy code in such scenarios
+- useReducer can be used as a replacement for useState() if you need 'more powerful state management'
+
+- more complex to use, requires more set up
+- for the majority of cases, useState is probably better - only beneficial when the state is complex
+
+
+- note that the way react updates its state is shceduled, and when we rely on a previous state we should use the function form in order to avoid reading an un-updated version of the state
+- this also applies when state relies on other state - sometimes react does not update the state in time before execution 
+- in other words, if we are relying on some other state variable - we still want to use our function form - however, we cant
+- we can only get the latest state of the stateUpdtating function we are using
+- this is a scenario where useReducer is always a good choice, if you update a state based on another state
+
+
+Using the useReducer() Hook
+----------------------------
+
+const [state, dispatchFn] = useReducer(reducerFn, initialState, initFn)
+
+- useReducer, just like use state - returns an array with exactly two values which we can use destucturing to extract and store in seperate constants
+-> the first value is the latest state snapshot
+-> the second value is a function that allows you to update that state snapshot
+	-> howver, this works a little differently than useState
+	-> instead of setting a new state value, you will dispatch an action
+	-> that action will be consumed by the first argument you pass to useReducer (reducerFN)
+
+reducerFN
+- this is a function that gets the latest state snapshot automatically, and it gets the action that was dispatched
+- react will call this reducer function whenever a new action is dispatched
+- should return a new updated state
+
+- you can set the initalState in addition, as well as an initial function (initFN) that should run to set the initial state
+- this is incase your initial state is a bit more complex e.g. a result of an http request(ignore for now)
+
+
+(note 4.30 lecture 116, important points)
+How we would use this hook
+- we could define the reducerFn function outside of the component, then pass a pointer to it in the useReducer hook to make things cleaner
+- we can do this because inside of this reducerFn, we won't need any data that's generated inside of the component function
+- all the data which will be required and used inside of the reducerFN will be passed into this function when it's executed - by React, automatically
+
+
+- we first call the useReducer hook in our component, deconstructing it into its state and dispatch function constants.
+- when we call it, we pass it a reducerFn (which could be a pointer to a definition outside of the component to make it cleaner) as the first argument
+- we also can pass it an initial state (for something like user input, we might set this to an object with properties to keep track of the input value, and whether that value is valid - set to intial state of empty strings and null)
+ 
+
+- an event would happen (user input, blur, click etc)
+- in the event handler, we would call the dispatch function, passing it a value
+- conventionally, to make it easier for us, we usually pass an object with a property called 'type', but we can pass what ever we want
+- this type property is intended to store a string that labels the event in which it happened in
+- we could also pass a payload, aka extra information that might be relevant to this event - e.g, for user input events, we might want to pass that input (event.target.value)
+	e.g. dispatchFn({type: 'USER_INPUT', val: event.target.value})
+
+- this object being passed into the dispatch function is what we refer to as the action
+
+in our reducer function(reducerFn), which we might define outside of our component, we pass this action
+- the reducerFn takes two arguments - the first argument being the most recent state
+- the second argument is our action
+
+- what ever you return from this reducerFn will be the new state
+
+- keeping this in mind, we can check what event was triggered by using conditional statements with our action.type
+- based on the action.type, we can run different code that updates our state in their own ways
+- e.g. if the reducerFn was triggered by a user input
+	-> we could check for the event e.g. if(action.type === 'someEvent'){...}
+	-> we would return an object to update our state
+	-> this object would contain our initial object properties, but we would overwrite their values with the relevant values
+
+Look at the project for this section for more in depth examples
+
+
+
+Introducing React Context (Context API)
+---------------------------------------
+- passing data through props from a parent component to a child component is normal activity in React
+- however, in bigger apps - this can become a problem when we are just leveraging components in order to pass data
+- in other words, its not a great idea to just use components for the sole purpose of passing data
+- in larger apps, we could be passing data through a large chain of components, none of which use that data except for the last component
+- the larger these prop chains are, the more inconvinient it is for us as a developer to write the code for our applications
+- it would be nice if we could use props in a component to only receive the data the component really needs from its parent, and not to forward other data through the parent which the parent doesn't ever manage or need itself
+
+- for this, we have a component-wide, 'behind-the-scenes' State Storage built into React called React Context
+- this allows us to, for example, trigger an action in that component-wide State Storage, and then directly pass that to the component that is interested without building such a long prop chain
+
+
+Using the React Context API
+---------------------------
+- create a new folder within your src folder, name it what ever (store/context)
+- create a .js file inside, name it whatever (auth-context.js for example)
+- import React
+- call the createContext method on React, and pass it a default state
+	-> createContext takes one argument which is your initial state wide state 
+	-> this can be set to anything, like a string, but usually we use an object
+	-> createContext returns an object, this object contains your state wide state - and will also contain components
+	-> this object is not a component itself, but is an object that will contain a component
+- we store the return of this method into a const, name it like it was a component (Capital Camel), because it will contain components
+- we'll need this object in other files so we export it to make it available in other files
+
+- we can now import it into other files
+- in order to use it in other files we have to do two things: provide it and consume it
+
+provide:
+- means that you wrap, in JSX code, all the components that should be able to tap/listen into that Context
+- e.g. if we need it in every component, we would wrap everything in our App component with it
+
+- once we import our context into the component we want to use it in:
+- note that we need a component if we want to insert something into our JSX..
+- we can acces the 'provider' component by adding a '.' after the name of our Context
+- we wrap the components with the context provider component, e.g. <AuthContext.Provider>
+- this is a component we can use in our JSX code, and we can wrap it around other components
+- those other components and all their descendant components will now have access to the context
+- note that this provider component can act like the root component, so you don't need to wrap it in a fragment or a div
+
+consume/listening:
+- two ways of consuming: using the consumer components or using the hook
+- we usually use the hook but we will go over both methods
+
+Consumer component:
+- we go to the component file we need the state in, we wrap the jsx in our context.consumer component (like provider but on the consumer side))
+- it works a little differently than provider though
+- within our JSX we need to return a dynamic expression {}, within which we have a function that takes an argument
+- the argument represents the object from our context
+- we can use this object to access our state instead of using props, e.g. ctx.data instead of props.data
+- note that we set a default state in our context
+	-> this default state will only be used if the provider component is not used to wrap a parent component - hence we get the default value that we defined within the context file
+	-> technically the provider component isnt even needed if we have a default value ...
+	-> however, in reality, you will use context to have a value which can change
+	-> that will only be possible with a provider 
+- if we ARE wrapping a parent with the provider component, we should add a 'value' prop (has to be named value)
+- to this value prop, we can assign our context object (copy paste our default object and assign that to the value prop)
+- when ever this value changes, the new value will be passed down to all consuming components
+- to make the properties of our object dynamic, we would assign them state as values - when this state changes so does our object (through events etc)
+- the difference from before is that we don't need to use a prop to forward our data
+This is an okayish way of doing this, howver there is a more elegant solution
+
+
+useContext Hook
+-----------------
+- a much easier and cleaner way of accomplishing the above
+- we start by importing our context file into the component we want to consumer
+- all we need to do now is import useContext, a named import, from React
+- we can then call this hook within our component
+- this hook takes one argument, which is a pointer to the context object
+- it returns that object, which we can store in a constant
+- we can then use this constant to access the data from our constant within our child component(consumer)
+
+Note that both ways are valid, this is just a more elegant way of accomplishing component wide state storage
+
+
+Making Context Dynamic
+-----------------------
+- we can set up a dynamic context where we don't just pass data to other components, but also functions
+- note that we are importing our context object into the parent component that we want to wrap all other relevant components in
+- in this parent component, we are wrapping the relevant components with our context.provider component, and defining the value we want to pass
+- this value is an object that has the properties we want to pass, we can pass state variables in order to make the data dynamic
+- we can also pass a pointer to a function as a value for a property, which will allow us to pass functions to the descendents
+- this allows us to pass down values and functions 
+- therefor we are now using this component wide context object to manage our state and to manage our function that changes the state
+- hence we don't need props in all our intermediate components
+
+- using context isnt always the answer though, for things like re-usable buttons, we don't want the event handler for them to always be the same
+- in this case, and other more general cases, we would rather use props to set their values/functions
+- props are the mechanism to configure components and make them reusable
+
+- only if you have something which you would forward through a lot of components, and you're forwarding to a component that does something very specific..
+- in such cases, you want to consider context
+
+
+Building & Using a Custom Context Provider Component
+-----------------------------------------------------
+- its a good idea to also add your functions to the default context when you create the context (in the context file)
+- you can just store a dummy function which does nothing (include parameters)
+- this actually give you better IDE auto completion
+- VS code looks at the default context object to find out what you are able to access on your context 
+- this means that even if you passed an object with specific properties on your actual provider component - it will not be detected by auto complete unless they also exist on the default context object 
+
+- another thing you might consider is creating a seperate Context Management component, essentially pulling out all of your context logic from the App component
+- how does this work? Lets start from the beginning:
+
+- we start from creating the store folder in our src folder, and creating our context.js file (named however we want)
+- we import React from 'react, create our context using React.createContext - set the initial state to some dummy state that has relevant key names (for autocompletion, data and functions relevant to the context)
+- store the object returned into a const
+- export this newly created Context object as default
+
+- we then create an actual component, which is intended to be our own custom provider component (named as such -> ContextProvider)
+- this component will take props as an argument (for props.children)
+- this component will return jsx that utilizes the built in Context.Provider component that exists on our Context object
+- the Context.Provider element will have props.children between the tags (in order to become a wrapper component, allowing us to use this component to wrap other content)
+- we export this component as a named export
+
+- we can then import useState and useEffect inside of our context.js file
+
+Inside of our custom provider component:
+- we can set state using the useState hook, creating a state variable and a state updating function if required 
+- we can define any logic for handlers that we may need to pass
+- we can also utilize useState if needed
+- this allows us to handle the entire context state in this seperate provider component 
+- then, on our Context.Provider element in our jsx of this custom provider component:
+	-> we set the 'value' property
+	-> we set it to an object that contains the properties we want to pass to any descendents this custom provider component ends up wrapping
+	-> these property key names should be the same as the ones in our default context object (to make auto complete work better)
+	-> the corresponding values should be assigned (the state and functions defined in our custom provider component)
+
+We can then import this centralized context file into our index.js file, and wrap our App component with our new custom context provider component
+- this essentially allows us to pass all of our context data and the functions that manipulate that data, to every descendant of App.js
+- now we just have to access this context in the relevant components:
+	-> in the descendent component file where we need the context, import useContext, a named import, from react
+	-> also ensure to import our context object from context.js aswell
+	-> call the useContext hook, passing a pointer to the context file, and storing the returned object into a constant
+	-> we can now use dot notation to access the context data from this context object (simillar to how props work)
+
+
+React Context Limitations:
+--------------------------
+- React Context is great for app-wide or component-wide state, essentially state that effects multiple components
+- it's not a replacement for component configuration e.g. for re-usable buttons, you would want to use props
+
+- props for configuration
+- context for state management accross components or possibly accross the entire app
+
+- even then, we have limitations
+- React context is not optimized for high frequency changes e.g. state changes every second or multiple times per second
+- if you do have app wide or component wide state that changes at a high frequency, we have a better tool for that later (REDUX)
+
+- React Context also should'nt be used to replace all component communications and props
+- Component should still be configurable via props and short 'prop chains' might not need any replacement
+
+
+Learning the 'Rules of Hooks'
+-----------------------------
+- React hooks are all those functions that start with 'use', e.g. useState, useEffect, useRef, useReducer, useContext etc many more
+- two main rules to remember for hooks:
+	-> Only call React Hooks in React Functions
+		-> React component functions
+		-> Custom Hooks (covered later)
+
+	-> Only call React Hooks at the Top Level
+		-> Don't call them in nested functions
+		-> Don't call them in any block statements
+
+useEffect Hook specific rule:
+- ALWAYS add everything you refer to inside of useEffect() as a dependency! (unless there is a good reason not to do that )
+- does not include state updating functions
+
+  
