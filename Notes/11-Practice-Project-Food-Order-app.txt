@@ -1,0 +1,146 @@
+Useful things we learned:
+- css modules
+- component tree structure
+
+- creating reusable and/or configurable UI components like Card comonents and Input components
+- rendering a list using an array of objects
+- creating a form
+- creating a cart
+- creating a modal and using portal to make it semantically correct
+
+- using dummy data to set up structure and styles before implementing state logic
+
+
+Creating a Cart component
+-------------------------
+- a cart is essentially an unordered list of items, with a total amount, and buttons to close and order
+- can be its own page or a modal
+- it usually takes some list data (array of objects with multiple properties) and displays it
+	-> properties usually include item names, prices and ids
+
+- we make sure we import our css module
+- if we plan on the Cart being a Modal, we should import that Modal (explained later on)
+
+- we can use Dummy Data to start off, just to see our structure and styles
+	-> create an array of objects with dummy data for the above mentioned properties and store in a global variable
+	-> we can create a ul
+	-> within this ul we can have a dynamic expression
+	-> within this, we can insert our dummy data (array), which we can then use the map method on
+	-> for each item of our data, we want to return a list item, we can make it display the name of our item for now (between OC)
+	-> we can store this in our component as variable then insert this variable in the jsx
+
+Styles:
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 20rem;
+  overflow: auto;
+
+- the return statement:
+	-> includes a fragment/modal as the main root element
+	-> has our cart items list variable in a dynamic expression as its first child
+	-> followed by a div for the amount title and number elements
+	-> followed by a div that contains the two buttons, close and order
+	-> style these the way you want
+
+
+
+
+Creating a Modal UI component - using portals
+---------------------------------------------
+- one of the most important things to understand because this appears in the majority of apps
+- we essentially create a Modal wrapper, wrapping the content(another component) we want to appear in the modal
+- in our html, above our root element, we create another element with a specific id of our choice (e.g. 'overlays')
+- we will portal to this div, it is our portal element (can select with getElementbyid('overlays), can be stored as a variable)
+
+imports:
+- Fragment from react
+- ReactDom from react-dom
+- classes from your css module
+
+export:
+- Modal as default (main component)
+
+This Modal contains 2 components:
+- the Backdrop
+- the ModalOverlay
+
+We can decide to either split it up into different component files, or keep all of the components in one file.
+The choice is yours, just import and export accordingly. In our example - these components are not verbose so we kept one file.
+
+--------
+Backdrop:
+-> takes props as an argument (not used yet..)
+-> returns a div with the back drop styles (dark overlay over whole viewport)
+
+Styles:
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 20;
+  background-color: rgba(0, 0, 0, 0.75);
+
+--------
+ModalOverlay:
+-> takes props as an argument
+-> returns a div (modal - container)
+-> inside is another div(content - container)
+-> the inner div is passed props.children
+
+Styles:
+  position: fixed;
+  top: 20vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  z-index: 30;
+  any background color that isn't seethrough
+  	
+--------
+Modal(default export, the main component)
+-> takes props as an argument
+-> wrapped in a Fragment component
+-> within this, we have two dynamic expressions as children (siblings to eachother)
+-> within the each dynamic expression, we use ReactDOM's createPortal method 
+	-> for the first one, we pass Backdrop as the first argument, and pass the portal element as the second argument
+	-> do the same for the second one, but pass ModalOverlays instead as the first argument
+-> within the ModalOverlay custom element's OC tags, we pass props.children
+	-> allows us to wrap another component with the Modal, passing it to ModalOverlay and applying relevant styles
+
+
+Making the Modal render conditionally
+--------------------------------------
+- the Modal we created is meant to wrap another element, e.g. a cart component
+-> this means that within this cart component, its return JSX is wrapped in our Modal component
+-> meaning every time we use our cart component, we are using our Modal component (the backdrop and overlay will appear with the cart as content)
+
+- this Modal is meant to render when an 'open' button somwhere on the main page is clicked
+- it is also meant to dissapear when a 'close' button is clicked within the Modal OR the backdrop is clicked
+
+- we most likely import and place our Cart(Modal) element within the return statement of our App component.
+
+Conditional Render in App Component:
+- ensure useState is imported
+- ensure our Cart component is imported
+
+- we first create the Cart's state using useState, setting the initial value to false (closed to start)
+-> this is meant to determine whether Cart should be rendered or not
+-> this gives us a state variable and a SUF (state updating function)
+-> in our return jsx, as the first child of the root element, we insert a dynamic expression {}
+-> within this dynamic expression, we use short circuiting logic to conditionally render our Cart element
+-> this requires our Cart state variable to be true in order for our Cart element to render
+
+
+Adding the Open and Close functionality to our Modal
+----------------------------------------------------
+- still within our App component, we need a way to open the modal when we click the 'open' button on the main page
+- we also need a way to close the button when we click the 'close' button on the modal overlay
+-> we create handler functions for both of these situations:
+	-> open cart, where we change the Cart state to true
+	-> close cart, where we change the Cart state to false
+
+-> we then pass our open cart handler to the component prop chain that contains our open button (e.g. Header> HeaderCartButton > button)
+-> we also pass our close cart handler to the prop chain that contains our close button (e.g. Cart>button)
+-> we also pass our close car handler to the prop chain that contains our backdrop (e.g. Cart>Modal>Backdrop>div)
+
+

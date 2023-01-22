@@ -387,4 +387,44 @@ useEffect Hook specific rule:
 - ALWAYS add everything you refer to inside of useEffect() as a dependency! (unless there is a good reason not to do that )
 - does not include state updating functions
 
-  
+
+Diving into 'Forward Refs'
+--------------------------
+- in the case of building a custom element, for e.g. an input element that is configurable and re-usable...
+- we might want to also give it methods that are similar to the built in element that it is imitating, e.g. the focus method on an input element
+- we might think that we can use 'refs' to get access to the rendered node, connect the ref to the built in element within our custom input element 
+- then add a method that when called, calls the focus method 
+- howvever, when we try to access this method from a parent component (using refs there as well to connect to dom node), it will not work
+- refs do not work on our custom components, we also do not pass the ref down to our custom input element 
+
+- we can solve this by using the 'useImperativeHandle' hook
+- allows us to use the component, or the functionalities inside this component imperatively
+- this allows you to directly call or manipulate something in the component, programmatically
+- this is something you rarely want to use, you should find alternatives - however, it can be a good solution
+
+- useImperativeHandle() takes two arguments:
+	-> the second one is a function should return an object
+	-> this object will contain all the data you will be able to use from outside
+	-> we do this by creating property keys (with names of our choice) that have a value pointing to the data we want to return
+	-> these keys will be the externally available name
+
+	-> the first argument is interesting, but before we go into that
+	-> our component function can take props as an argument itself, which allows us to access properties that are passed to it
+	-> it also can take ANOTHER argument, called 'ref', the second argument, which allows us to use the ref if it is set from outside
+	-> it is this ref which we use as our first argument in useImperativeHandle()
+	
+	-> in order to enable our 'ref' as an argument for our component function we need to export our component function in a special way by wrapping it with something special
+	-> const customInputComponent = React.forwardRef((props, ref) => {...})
+	-> this is a method that we execute, to which we pass our component function
+	-> forwardRef returns our react component which we can still store in our constant
+	-> this react component is now capable of being bound to a ref
+
+	-> with this, we can now connect a ref to this in its parent component, connecting it to that ref
+	-> we can also access the externally available data through the key names we set, meaning if we exported a method that used a built in method with a ref - we could use that method directly in our parent function
+
+
+- with useImperativeHandle() and React.forwardRef(), you can expose functionalities from a React Component to its parent Component
+- to then use your Component in the parent Component through refs and trigger certain functionalities
+- we can do this for functions and values
+- this is something we can do but not something that we need all the time, avoid at all costs
+- in cases that utilize focusing or scrolling.. this can be very useful
