@@ -1,0 +1,97 @@
+Intro
+------
+- so far, we have only worked with dummy data
+- we're now going to look at how we can connect our application to a backend
+
+Connecting a Backend & Database
+- how do React Apps Interact with Databases?
+- sending Http Requests & Using Responses
+- Handling Errors & Loading State
+
+
+How To (Not) Connect To A DataBase
+-----------------------------------
+- we never want to connect directly to a database from our browser
+	-> this exposes our database to the browser, which can be accessed by anyone through their browser
+	-> it also causes some performace issues, though the main problem is security
+- instead, we interact with a backend API (node js, php, .net) 
+	-> this backend API holds all of the credentials (logins and passwords for example)
+	-> it lives on a seperate server most of the time, the key point is that it is seperate from our front end
+	-> users do not have access to this backend api through the browser
+
+
+API 
+- we eventually want to switch from dummy data to an actual API
+- API stands for application programming interface, which is a very broad term
+- essentially means that in our code we're dealing with something which has a clearly defined interface(process/rules) on how we can acheive certain results and do certain tasks
+- when we talk about API in the context of HTTP requests, we typically talk about REST or GraphQL APIs - two different standards for how a server should expose its data
+
+Rest API
+- simply means that there are a couple of URLs, to which you send a request to get back data in a certain format
+- different URLs to which you send different requests will give you different chunks of data
+
+- we can use this api to access a backend's data in order to populate our appication's list instead of using dummy data
+
+
+Sending a Get Request
+---------------------
+- JS has a built in mechanism that allows us to fetch data from a backend api.. called the fetch() API
+- we can call this function and pass it a string that contains the URL that we want to retreive data from
+- we can also pass it a second argument that contains an object with other configuration properties that we will not go into at this point
+- by default, a GET request will be sent
+
+- fetch returns a promise which allows us to react to the response or any potential errors
+- a promise is an object that will eventually yield some data
+- sending an HTTP request is an asynchronous task, it doesn't finish immediately
+- we can handle this promise by chaining the .then method 
+
+- the .then() method takes an argument, which will be a function that uses the fulfilled value of the returned promised as it's argument (the response)
+- we can design this function to take the json data returned from our fetch call, and turn it into a JS object
+	-> we do this by calling the .json() method on the response
+	-> we return this, which essentially returns a promise as well
+
+- we handle this second promise with another .then chain, which we pass a function as an argument which takes the previous response as an argument
+- this response is a JS object with a lot of different properties that we can access
+- we usually are looking for a property that contains an array of objects that each contain relevant information for our application
+	-> each object has a lot of properties, most are not relevant but we should look for the keys of the ones that are
+- we want to access this array and map through its objects, and for each object, return an object with only the relevant data, saved to property names of our choice
+- we save the result of this mapping to a variable (will be a new array of objects with the properties we defined)
+- we then set the state of our applications list array to this variable, essentially giving us a list of new data that we can work with in our application 
+
+
+- we could also use async/await instead of .then()
+
+
+Handling Loading & Data States
+------------------------------
+- when doing http requests, it might take some time before you get your data and can then display your intended results
+- this is a bad user experience, we usually want to at least let the user know that we are doing this, and that some work is being done
+- we can do this with some text, or more commonly - a loading spinner
+
+- we can create some state that represents whether we are fetching data or not (isLoading for example)
+- set this state to false, before we start fetching - set it to true
+- after we have finished fetching (at the end of the async function), set it back to false
+
+- we can then conditionally render our spinner or our list depending on the state values
+
+
+Handling Http Errors
+--------------------
+- sometimes when you send an http request, it will be unsuccessful
+- this could be for a number of reasons, could be a bad request, could not have internet connection, maybe not authorized for the request
+- we need a way to handle these errors
+- each of these errors return an error code
+
+- we can set state that keeps track of whether or not an error is thrown
+- by default, the fetch API does not throw errors when an error code is returned 
+- we have to tell it to do this ourselves
+- this is easy, we wrap the relevant code in our async function's definition in a try/catch block
+- we then add an if statement after we await our fetch response
+- we then check if the response.ok is true or false
+- if it is false, we want to throw new Error('some error text')
+- this stops our execution of the next line, and then proceeds to execute the code in our catch block
+- the catch block takes the value that we threw in our if statement within our try block (not exactly...)
+- we can call setError and pass it an argument of error.message
+- we want to make sure we set our loading state to false as well (can be done outside of the try/catch)
+
+- we can then conditionally render some relevant content based on the value of our error state
