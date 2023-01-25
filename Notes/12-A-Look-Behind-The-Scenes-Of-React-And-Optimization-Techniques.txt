@@ -1,0 +1,93 @@
+- componenets are re-evaluated when ever there is a state change
+- re-evaluating and re-rendering are not the same thing
+- react does not re-render every time it re-evaluates a component
+- instead, it checks to see if the doms previous state is different from its current state
+	-> if it detects a difference, it will make that change to the current state in that place and only that place
+	-> the rest of the DOM does not get rerendered 
+	-> this is a virtual comparison that takes place everytime a component is re-evaluated
+
+- when a parent component is re-evaluated, all of its children are also re-evaluated
+- In a large component tree, some components might never need to change thus never really needing to be re-evaluated
+- that means that there can be a lot of unesseccary re-evaluating, resulting in less than optimal performance
+- React is highly optimized for executions and comparisons, so in smaller apps - this might not matter as much
+- however, in bigger apps - we might want to optimize that
+
+
+Preventing Unnecessary Re-Evaluations with React.memo()
+-------------------------------------------------------
+- we can tell react that it should only execute a component under certain circumstances
+- those circumstance would be that the props which the component received, changed - for example.
+- if we want to check for this change, we need to wrap our export with React.memo()
+- this also prevents any of the components children from being re-evaluated
+
+- note that this optimization comes at a cost
+- when ever a state change happens that would usually cause this child component to re-render, it compares this comonent's new prop values to its old prop values
+- this means React stores the prop values and makes the comparison - which has its own performance cost
+- it depends greatly on the component you are applying React.memo to, whether it is worth it or not
+- you're trading the cost of re-evaluating the component with the cost of comparing the props
+- hard to determine this, just keep in mind that it is usually worth it on a huge component tree with a lot of child components, if used on a high level where relevant
+
+- one thing to note is that if a component receives a refference value (e.g. an object, array or functin) as a prop, it technically does change
+- this is because how refference values work vs primitive values, refference values are always different- even if they store the same values
+	-> when props are compared - primitive values with equal assignments will equal eachother
+	-> however, reference values with equal assigments will not equal eachother
+- there is a solution to this
+
+
+Preventing Fucntion Re-Creation with useCallback()
+--------------------------------------------------
+- to make React.memo() work for prop values that are objects as well, we need to tweak the way we create and store those objects
+- the useCallback() hook helps us with this
+- we import this from react as a named import
+- it allows us to basically store a function accross component executions - saving the function so that it is not recreated with every execution
+- one in the same object is store in the same place in memory
+
+- to use this we simply wrap the function we want to use it with within its parenthesis as a first argument
+- it also takes a second argument, which should be an array of its dependencies (like useEffect)
+
+
+useCallback() and its Dependencies
+----------------------------------
+- in JS, functions are closures - meaning that they have access to all the variables in their scope at the time of creation
+- when we use useCallback, we are telling React to not re-create the function, meaning that what ever context this function has at its creation will always be the same context
+- if this function includes context which may change - even if the state changes, it will not be reflected in our saved function
+
+- remember that the component using React.memo does not re-evaluate, the function persists because of useCallback
+- this is because useCallback saves the function once, then re-uses that function everytime the application re-evaluates 
+- this means, the initial values of its context are saved, then never changed - even if state that is used inside the function changes in its parent component
+- to fix this, we simply add any state/context that is needed as a dependency
+- this will make sure that the function is recreated any time a dependency changes - thus storing the new value of the dependencies 
+
+NOTE the first summary of this module is absolutely fantastic, watch again if there is any confusion of topics
+-> maybe take the whole 4min lecture down as notes
+
+
+First Summary
+-------------
+- in React apps, you work with components - typically function components
+- the components have one job in the end - the JSX code they return, which tells React what the output of that component should be	
+- in your React component, you can work with state, or with props, or with context (though props and context all come down to state changes in the end) 
+ -> to make changes to a component and to make changes to the data that affects this component or that affects part of your application
+
+- when ever you change state in a component, that component where the state changed is re-evaluated
+- this simply means that the component function is executed again, all the code runs again and you get a new output
+	-> it might actually be exactly the same output as before, but it could also be different
+- React simply takes the result of this latest evaluation and compares it to the previous evaluation's result
+- it does this for all affected components
+- it then hands off any differences it identified to, in our case, React DOM
+- React DOM will take those changes and apply them to the real DOM in the browser - and really only those changes, nothing else
+
+- when React re-evaluates a components, it not only re-evaluates that component- 
+	-> but since it reruns the entire function, and therefor also rebuilds its jsx code.. rebuilds the output for this latest snapshot
+	-> it will also run all components in the JSX code (child components)
+	-> this might cause unnecessary re-executions of child components
+
+- to avoid unnecessary re-executions of child components, you can use React.memo to tell React to only re-execute a function if it's props change
+	-> if there are no new values, do not re-execute this function
+
+- since re-evaluating a component means the entire component function runs again, that can have strange effects
+- if you create functions in the function, and you pass those functions through props to other components -
+	-> you will indeed get a new function object, and even React memo will not be able to help you because objects are reference values
+	-> comparing them with === (which is what React does under the hood) will not work (could be == idk)
+	-> that's where useCallback comes in and can help you
+	-> with useCallback, you can tell React that it should store a function and not recreate it when the surrounding function runs again as long as certain dependencies didn't change

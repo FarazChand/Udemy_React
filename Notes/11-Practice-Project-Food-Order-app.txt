@@ -14,6 +14,7 @@ Useful things we learned:
 
 - using refs to gather input data
 - using forward refs to allow us to use refs on our custom elements, getting data from a child components input element
+- using useEffect for bump animation
 
 - using dummy data to set up structure and styles before implementing state logic
 
