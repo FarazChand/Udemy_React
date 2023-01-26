@@ -91,7 +91,24 @@ Handling Http Errors
 - if it is false, we want to throw new Error('some error text')
 - this stops our execution of the next line, and then proceeds to execute the code in our catch block
 - the catch block takes the value that we threw in our if statement within our try block (not exactly...)
-- we can call setError and pass it an argument of error.message
+- we can set our error state to error.message
 - we want to make sure we set our loading state to false as well (can be done outside of the try/catch)
 
 - we can then conditionally render some relevant content based on the value of our error state
+
+
+Using Use Effect for the Next Steps
+-----------------------------------
+take notes 
+
+
+Firebase
+--------
+- a service provided by Google
+- a backend you can use without writing any code
+- not a database, but a backend that comes with a database - as well as many other features
+- gives us a full backend app, a complete rest API to which we can send requests
+
+POST
+------
+take notes

@@ -1,0 +1,55 @@
+Intro
+-----
+- What & Why?
+- Building a Custom Hook
+- Custom Hook Rules & Practices
+
+
+What are Custom Hooks?
+----------------------
+- essentially just functions
+- outsource stateful logic into re-usable functions
+- unlike "regular functions", custom hooks can use other React hooks and React state
+
+
+Why?
+- in a real application, you might have different components - which to a certain extent, might do related tasks
+- code duplications...
+- if these components also use state or hooks...
+- we can refactor using custom hooks
+
+How?
+- create a seperate directory for organizational purposes (like we do for components)
+- create a new js file for your hook, must be named use-something, start with the word use - just like built in hooks
+- the function should also be named the same (just like a normal component)
+- having the function name start with 'use' allows react to know that we are dealing with a hook
+- if we use it in the wrong place, the IDE will let us know
+- export as usual
+- put the logic you want to reuse inside this function, import the required hooks for state etc
+- no jsx needed in the custom hook, just the logic
+
+
+Using Custom Hooks
+------------------
+- use a custom hook just like you use the built in hooks - calling it like a function.. because it is just a function
+- import, call
+- if you call a custom hook in a component, and that hook registers a state or an effect
+	-> this state and effect will be tied to the component in which you use your custom hook
+	-> this means that if we use this custom hook in multiple components, every component will receive its own state/effect
+	-> just the logic is shared, not the state - the hook is executed again for every component instance
+
+- to make this state available, we can simply return it from our hook
+- you can return whatever you want, an array, a number, an object. .etc
+- in the component where we use this custom hook, we can use this return value by creating a constant to store it in
+
+
+Configuring Custom Hooks
+------------------------
+- between components, we might have very simalar tasks that use state/effects with slight variations 
+- we can configure our custom hooks to deal with these variations by accepting arguments/parameters (just like any function)
+- we can accept multiple arguments, initial arguments (just like normal hooks)
+- any parameters for our hook that are eventually used in something like useEffect are actually dependencies for useEffect
+
+The first example given in this section, though unrealistic, does a good job showcasing the basics of custom hooks.
+
+https://react-http-d5b4c-default-rtdb.firebaseio.com/tasks.json
