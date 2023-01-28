@@ -1,0 +1,58 @@
+Intro
+----- 
+- What's Complex About Forms?
+- Handling Inputs & Forms with React
+- Simplifications
+
+
+What's Complex About Forms?
+---------------------------
+- Forms and inputs can assume different states
+	-> one or more inputs are invalid:
+	-> Output input-specific error messages & highlight problematic inputs
+	-> Ensure form can't be submitted/saved
+
+	-> all inputs are valid:
+	-> Allow form to be submitted/saved
+
+	-> unknown (async)
+
+When to Validate?
+- when form is submitted
+	-> allows the user to enter a valid value before warning them
+	-> Avoid unnecessary warning but maybe present feedvack 'too late'
+- when an input is losing focus
+	-> allows the user to enter a valid value before warning them
+	-> very useful for untouched forms
+	-> does not update from incorrect to correct until you unfocus as well, downside
+- on every keystroke
+	-> warns user before they had a chance of entering valid values 
+	-> if applied only on invalid inputs, has the potential of providing more direct feedback
+
+
+
+
+
+----
+
+- forms
+	-> prevent default
+
+- can listen to every keystroke and store the value in some state variable
+	-> create state to store keystrokes
+	-> create a handler function that updates the state variable on every keystroke
+	-> add the onChange event listener to the desired input field
+	-> can access state variable on form submit
+	-> can reset input field on form submit with two way binding, setting the input value property to the state variable
+
+- can use a Ref to fetch the input once the user is done typing in a value
+	-> call useRef and store the ref in a constant
+	-> add the ref to the desired input using the ref property and the constant above as the value
+	-> can access the value of this input through this ref.current.value on form submit
+	-> can reset input field on form submit by directly manipulating the dom, not recommended 
+
+
+------
+- code on the browser can be edited by users, so validation in the front end is simply for user experience
+- actual validation should happen in the backend
+ 
